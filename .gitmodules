@@ -324,3 +324,6 @@
 	url = ../qtquick3d.git
 	branch = 5.15.2
 	status = addon
+[submodule "cmake/npm"]
+	path = cmake/npm
+	url = https://github.com/rogii-com/cnpm.git
