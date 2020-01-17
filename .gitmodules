@@ -327,3 +327,6 @@
 [submodule "cmake/npm"]
 	path = cmake/npm
 	url = https://github.com/rogii-com/cnpm.git
+[submodule "cmake/utils"]
+	path = cmake/utils
+	url = https://github.com/rogii-com/cmake-utils.git
