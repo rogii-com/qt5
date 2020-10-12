@@ -45,8 +45,13 @@ set(
     OpenGL
     LinguistTools
     Qml
+    QmlModels
+    QmlWorkerScript
     Quick
     QuickControls2
+    QuickParticles
+    QuickShapes
+    QuickTemplates2
     QuickTest
     QuickWidgets
     UiPlugin
@@ -82,48 +87,12 @@ unset(
     PREFIX_PATH_BACKUP33333399999
 )
 
-if(NOT TARGET Qt5::QuickTemplates2)
-    add_library(
-        Qt5::QuickTemplates2
-        SHARED
-        IMPORTED
-    )
-
-    if(WIN32)
-        set_target_properties(
-            Qt5::QuickTemplates2
-            PROPERTIES
-                IMPORTED_LOCATION
-                    "${CMAKE_CURRENT_LIST_DIR}/bin/Qt5QuickTemplates2${ROGII_SUFFIX}.dll"
-                IMPORTED_LOCATION_DEBUG
-                    "${CMAKE_CURRENT_LIST_DIR}/bin/Qt5QuickTemplates2${ROGII_SUFFIX}d.dll"
-                IMPORTED_IMPLIB
-                    "${CMAKE_CURRENT_LIST_DIR}/lib/Qt5QuickTemplates2${ROGII_SUFFIX}.lib"
-                IMPORTED_IMPLIB_DEBUG
-                    "${CMAKE_CURRENT_LIST_DIR}/lib/Qt5QuickTemplates2${ROGII_SUFFIX}d.lib"
-                INTERFACE_INCLUDE_DIRECTORIES
-                    "${CMAKE_CURRENT_LIST_DIR}/include/QtQuickTemplates2/;${CMAKE_CURRENT_LIST_DIR}/include/"
-                INTERFACE_LINK_LIBRARIES
-                    "Qt5::Quick"
-        )
-    elseif(UNIX)
-        set_target_properties(
-                Qt5::QuickTemplates2
-                PROPERTIES
-                    IMPORTED_LOCATION
-                        "${CMAKE_CURRENT_LIST_DIR}/lib/libQt5QuickTemplates2${ROGII_SUFFIX}.so.${QT_VERSION}"
-                    INTERFACE_INCLUDE_DIRECTORIES
-                        "${CMAKE_CURRENT_LIST_DIR}/include/QtQuickTemplates2/;${CMAKE_CURRENT_LIST_DIR}/include/"
-                    INTERFACE_LINK_LIBRARIES
-                        "Qt5::Quick"
-            )
-    endif()
-endif()
-
 set(
     TARGETS_TO_INSTALL
 
     QuickControls2
+    QuickParticles
+    QuickShapes
     QuickTemplates2
     QuickTest
 )
@@ -161,10 +130,13 @@ if(WIN32)
         Sql
         PrintSupport
         Qml
+        QmlModels
+        QmlWorkerScript
         Quick
         Core
         Gui
         Network
+        WebSockets
         Gui_EGL
         Gui_GLESv2
         QuickWidgets
@@ -284,6 +256,17 @@ elseif(UNIX)
     )
     install(
         FILES
+            $<TARGET_FILE:Qt5::WebSockets>
+        DESTINATION
+            .
+        COMPONENT
+            CNPM_RUNTIME
+        RENAME
+            libQt5WebSockets${ROGII_SUFFIX}.so.5
+        EXCLUDE_FROM_ALL
+    )
+    install(
+        FILES
             $<TARGET_FILE:Qt5::Concurrent>
         DESTINATION
             .
@@ -324,6 +307,28 @@ elseif(UNIX)
             CNPM_RUNTIME
         RENAME
             libQt5Qml${ROGII_SUFFIX}.so.5
+        EXCLUDE_FROM_ALL
+    )
+    install(
+        FILES
+            $<TARGET_FILE:Qt5::QmlModels>
+        DESTINATION
+            .
+        COMPONENT
+            CNPM_RUNTIME
+        RENAME
+            libQt5QmlModels${ROGII_SUFFIX}.so.5
+        EXCLUDE_FROM_ALL
+    )
+    install(
+        FILES
+            $<TARGET_FILE:Qt5::QmlWorkerScript>
+        DESTINATION
+            .
+        COMPONENT
+            CNPM_RUNTIME
+        RENAME
+            libQt5QmlWorkerScript${ROGII_SUFFIX}.so.5
         EXCLUDE_FROM_ALL
     )
     install(
