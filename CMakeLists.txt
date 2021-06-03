@@ -65,16 +65,31 @@ if((NOT PYTHON_RESULT EQUAL 0) OR (NOT PYTHON_ALL_OUTPUT MATCHES "2\.7"))
     )
 endif()
 
-message(
-    STATUS
-    "ENV{CL} = $ENV{CL}"
-)
-
-if(MSVC AND NOT "$ENV{CL}" MATCHES "\/MP")
-    message(
-        FATAL_ERROR
-        "ENV{CL} does not contain /MP."
+if(MSVC)
+    execute_process(
+        COMMAND
+            jom
+            /version
+        RESULT_VARIABLE
+            JOM_RESULT
+        OUTPUT_VARIABLE
+            JOM_ALL_OUTPUT
+        ERROR_VARIABLE
+            JOM_ALL_OUTPUT
     )
+
+    message(
+        STATUS
+        "JOM_RESULT = ${JOM_RESULT}; "
+        "JOM_ALL_OUTPUT = ${JOM_ALL_OUTPUT}"
+    )
+
+    if(NOT JOM_RESULT EQUAL 0)
+        message(
+            FATAL_ERROR
+            "Jom is not in the PATH."
+        )
+    endif()
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -297,7 +312,7 @@ elseif(MSVC)
             -openssl-runtime
             -I ${OPENSSL_INCLUDE_DIRECTROIES} -L ${OPENSSL_LIBDIR}
         COMMAND
-            nmake
+            jom /j${N}
         COMMAND
             nmake install
         WORKING_DIRECTORY
