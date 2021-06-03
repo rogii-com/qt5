@@ -12,6 +12,7 @@ ProcessorCount(N)
 message(STATUS "Processor count is ${N}")
 
 include(${PROJECT_SOURCE_DIR}/rogii/npm/Include.cmake)
+include(${PROJECT_SOURCE_DIR}/rogii/Environment.cmake)
 
 execute_process(
     COMMAND
@@ -88,54 +89,6 @@ if(MSVC)
             "Jom is not in the PATH."
         )
     endif()
-endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    CNPM_ADD_PACKAGE(
-        NAME
-            gxx_runtime
-        VERSION
-            9.2.1
-        BUILD_NUMBER
-            0
-    )
-    CNPM_ADD_PACKAGE(
-        NAME
-            OpenSSL
-        VERSION
-            1.1.1.7
-        BUILD_NUMBER
-            0
-    )
-elseif(MSVC)
-    CNPM_ADD_PACKAGE(
-        NAME
-            msvs
-        VERSION
-            2019.14.27.29110
-        BUILD_NUMBER
-            1
-    )
-
-    CNPM_ADD_PACKAGE(
-        NAME
-            WindowsSDK
-        VERSION
-            10.0.18362.0
-        BUILD_NUMBER
-            4
-    )
-
-    CNPM_ADD_PACKAGE(
-        NAME
-            OpenSSL
-        VERSION
-            1.1.1.7
-        BUILD_NUMBER
-            0
-        TAG
-            "sdk18362_vsbt19"
-    )
 endif()
 
 CNPM_PREPARE_PACKAGES(
