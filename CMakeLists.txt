@@ -11,7 +11,7 @@ include(ProcessorCount)
 ProcessorCount(N)
 message(STATUS "Processor count is ${N}")
 
-include(${PROJECT_SOURCE_DIR}/rogii/npm/NastyPackageManager.cmake)
+include(${PROJECT_SOURCE_DIR}/rogii/npm/Include.cmake)
 
 execute_process(
     COMMAND
@@ -91,7 +91,7 @@ if(MSVC)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    NPM_ADD_PACKAGE(
+    CNPM_ADD_PACKAGE(
         NAME
             gxx_runtime
         VERSION
@@ -99,7 +99,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         BUILD_NUMBER
             0
     )
-    NPM_ADD_PACKAGE(
+    CNPM_ADD_PACKAGE(
         NAME
             OpenSSL
         VERSION
@@ -108,7 +108,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             0
     )
 elseif(MSVC)
-    NPM_ADD_PACKAGE(
+    CNPM_ADD_PACKAGE(
         NAME
             msvs
         VERSION
@@ -117,7 +117,7 @@ elseif(MSVC)
             1
     )
 
-    NPM_ADD_PACKAGE(
+    CNPM_ADD_PACKAGE(
         NAME
             WindowsSDK
         VERSION
@@ -126,7 +126,7 @@ elseif(MSVC)
             4
     )
 
-    NPM_ADD_PACKAGE(
+    CNPM_ADD_PACKAGE(
         NAME
             OpenSSL
         VERSION
@@ -138,7 +138,7 @@ elseif(MSVC)
     )
 endif()
 
-NPM_PREPARE_PACKAGES(
+CNPM_PREPARE_PACKAGES(
     DEFAULT_REPOSITORY_URLS
     "$ENV{CNPM_URLS}"
 )
