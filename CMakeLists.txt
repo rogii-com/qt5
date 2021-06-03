@@ -195,11 +195,25 @@ set(
     "Rogii"
 )
 
-message(
-    STATUS
-    "Don't forget to update repo. "
-    "perl init-repository -f --mirror https://github.com/qt/ --module-subset=qtactiveqt,qtbase,qtdeclarative,qtdoc,qtgraphicaleffects,qtimageformats,qtquickcontrols,qtquickcontrols2,qtsvg,qttools,qttranslations,qtwebsockets,qtwinextras,qtxmlpatterns |& tee log-init-repository.txt"
+execute_process(
+    COMMAND
+        perl
+        init-repository
+        -f
+        --mirror https://github.com/qt/
+        --module-subset=qtactiveqt,qtbase,qtdeclarative,qtdoc,qtgraphicaleffects,qtimageformats,qtquickcontrols,qtquickcontrols2,qtsvg,qttools,qttranslations,qtwebsockets,qtwinextras,qtxmlpatterns
+    RESULT_VARIABLE
+        INIT_REPOSITORY_RESULT
+    WORKING_DIRECTORY
+        ${PROJECT_SOURCE_DIR}
 )
+
+if(NOT INIT_REPOSITORY_RESULT EQUAL 0)
+    message(
+        FATAL_ERROR
+        "Failed to initialize repository."
+    )
+endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_custom_command(
