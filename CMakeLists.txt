@@ -11,9 +11,7 @@ include(ProcessorCount)
 ProcessorCount(N)
 message(STATUS "Processor count is ${N}")
 
-include(
-    ${PROJECT_SOURCE_DIR}/cmake/npm/NastyPackageManager.cmake
-)
+include(${PROJECT_SOURCE_DIR}/rogii/npm/NastyPackageManager.cmake)
 
 execute_process(
     COMMAND
