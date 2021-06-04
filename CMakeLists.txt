@@ -179,6 +179,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             -force-debug-info
             -opensource
             -confirm-license
+            -nomake tests
             -nomake examples
             -no-compile-examples
             -opengl es2
@@ -241,6 +242,7 @@ elseif(MSVC)
             -confirm-license
             -plugin-sql-odbc
             -opengl dynamic
+            -nomake tests
             -nomake examples
             -no-compile-examples
             -skip qt3d
