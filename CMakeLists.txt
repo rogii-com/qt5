@@ -198,6 +198,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             -skip qtpim
             -skip qtpurchasing
             -skip qtqa
+            -skip qtquickcontrols2
             -skip qtremoteobjects
             -skip qtrepotools
             -skip qtscript
@@ -261,6 +262,7 @@ elseif(MSVC)
             -skip qtpim
             -skip qtpurchasing
             -skip qtqa
+            -skip qtquickcontrols2
             -skip qtremoteobjects
             -skip qtrepotools
             -skip qtscript

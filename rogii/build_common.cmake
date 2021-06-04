@@ -126,6 +126,128 @@ file(
         ${ROOT}/${PACKAGE_NAME}/bin
 )
 
+# WORKAROUND: build and install quickcontrols2 separately to enable build with precompiled qml
+
+include(ProcessorCount)
+ProcessorCount(N)
+
+find_package(
+    Git
+    REQUIRED
+)
+
+set(
+    PROJECT_ROOT_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/.."
+)
+
+set(
+    QUICKCONTROLS2_ROOT_PATH
+    "${PROJECT_ROOT_PATH}/qtquickcontrols2"
+)
+
+set(
+    QT_TOOLS_PATH
+    "${ROOT}/${PACKAGE_NAME}/bin"
+)
+
+get_filename_component(
+    INSTALL_DIR_NAME
+    "${ROOT}"
+    NAME
+)
+
+if(WIN32)
+    set(
+        PLATFORM_BUILD_COMMAND
+        jom /j${N}
+    )
+    set(
+        PLATFORM_INSTALL_COMMAND
+        nmake install
+    )
+elseif(UNIX)
+    set(
+        PLATFORM_BUILD_COMMAND
+        make -j${N}
+    )
+    set(
+        PLATFORM_INSTALL_COMMAND
+        make install
+    )
+else()
+    message(
+        FATAL_ERROR
+        "Unknown platform."
+    )
+endif()
+
+execute_process(
+    COMMAND
+        "${QT_TOOLS_PATH}/qmake" -help
+    RESULT_VARIABLE
+        QMAKE_RESULT
+)
+
+if(NOT QMAKE_RESULT EQUAL 0)
+    message(
+        FATAL_ERROR
+        "Qmake not found in '${QT_TOOLS_PATH}'."
+    )
+endif()
+
+execute_process(
+    COMMAND
+        "${QT_TOOLS_PATH}/qmlcachegen" -h
+    RESULT_VARIABLE
+        QUICK_COMPILER_RESULT
+)
+
+if(NOT QUICK_COMPILER_RESULT EQUAL 0)
+    message(
+        FATAL_ERROR
+        "Quick compiler not found in '${QT_TOOLS_PATH}'."
+    )
+endif()
+
+# Clean is required to configure quickcontrols2 correctly
+execute_process(
+    COMMAND
+        ${GIT_EXECUTABLE} clean -fdx -e /${INSTALL_DIR_NAME}/
+    WORKING_DIRECTORY
+        "${PROJECT_ROOT_PATH}"
+)
+
+execute_process(
+    COMMAND
+        ${GIT_EXECUTABLE} clean -fdx
+    WORKING_DIRECTORY
+        "${QUICKCONTROLS2_ROOT_PATH}"
+)
+
+execute_process(
+    COMMAND
+        "${QT_TOOLS_PATH}/qmake"
+    WORKING_DIRECTORY
+        "${QUICKCONTROLS2_ROOT_PATH}"
+)
+
+execute_process(
+    COMMAND
+        ${PLATFORM_BUILD_COMMAND}
+    WORKING_DIRECTORY
+        "${QUICKCONTROLS2_ROOT_PATH}"
+)
+
+execute_process(
+    COMMAND
+        ${PLATFORM_INSTALL_COMMAND}
+    WORKING_DIRECTORY
+        "${QUICKCONTROLS2_ROOT_PATH}"
+)
+
+# WORKAROUND end
+
 execute_process(
     COMMAND
         ${CMAKE_COMMAND} -E tar cf "${PACKAGE_NAME}.7z" --format=7zip -- "${PACKAGE_NAME}"
