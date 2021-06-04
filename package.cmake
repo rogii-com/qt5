@@ -29,21 +29,14 @@ set(
 )
 
 set(
-    COMPONENTS
+    COMPONENTS_TO_INSTALL
 
-    Core
     Concurrent
-    Designer
+    Core
     Gui
     Help
-    Svg
-    Widgets
-    Sql
-    PrintSupport
-    Test
     Network
-    OpenGL
-    LinguistTools
+    PrintSupport
     Qml
     QmlModels
     QmlWorkerScript
@@ -54,10 +47,25 @@ set(
     QuickTemplates2
     QuickTest
     QuickWidgets
+    Sql
+    Svg
+    Test
+    WebSockets
+    Widgets
+    Xml
+    XmlPatterns
+)
+
+set(
+    COMPONENTS
+
+    ${COMPONENTS_TO_INSTALL}
+    Designer
+    LinguistTools
+    OpenGL
+    QuickCompiler
     UiPlugin
     UiTools
-    WebSockets
-    Xml
 )
 
 find_package(
@@ -89,13 +97,18 @@ unset(
 
 set(
     TARGETS_TO_INSTALL
-
-    QuickControls2
-    QuickParticles
-    QuickShapes
-    QuickTemplates2
-    QuickTest
+    ${COMPONENTS_TO_INSTALL}
 )
+
+if(WIN32)
+    set(
+        TARGETS_TO_INSTALL
+
+        ${TARGETS_TO_INSTALL}
+        Gui_EGL
+        Gui_GLESv2
+    )
+endif()
 
 foreach(COMPONENT ${TARGETS_TO_INSTALL})
     set(
@@ -110,6 +123,7 @@ foreach(COMPONENT ${TARGETS_TO_INSTALL})
         install(
             FILES
                 $<TARGET_FILE:Qt5::${COMPONENT}>
+                $<$<PLATFORM_ID:Linux>:$<TARGET_SONAME_FILE:Qt5::${COMPONENT}>>
             DESTINATION
                 .
             COMPONENT
@@ -121,49 +135,6 @@ endforeach()
 
 if(WIN32)
     # TODO: remove copypaste
-    set(
-        TARGETS_TO_INSTALL
-
-        Concurrent
-        Svg
-        Widgets
-        Sql
-        PrintSupport
-        Qml
-        QmlModels
-        QmlWorkerScript
-        Quick
-        Core
-        Gui
-        Network
-        WebSockets
-        Gui_EGL
-        Gui_GLESv2
-        QuickWidgets
-    )
-
-    foreach(COMPONENT ${TARGETS_TO_INSTALL})
-        set(
-            COMPONENT_NAMES
-
-            CNPM_RUNTIME_Qt5_${COMPONENT}
-            CNPM_RUNTIME_Qt5
-            CNPM_RUNTIME
-        )
-
-        foreach(COMPONENT_NAME ${COMPONENT_NAMES})
-            install(
-                FILES
-                    $<TARGET_FILE:Qt5::${COMPONENT}>
-                DESTINATION
-                    .
-                COMPONENT
-                    ${COMPONENT_NAME}
-                EXCLUDE_FROM_ALL
-            )
-        endforeach()
-    endforeach()
-
     set(
         COMPONENT_NAMES
 
@@ -220,150 +191,6 @@ if(WIN32)
                 EXCLUDE
         )
     endforeach()
-elseif(UNIX)
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Core>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Core${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Gui>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Gui${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Network>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Network${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::WebSockets>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5WebSockets${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Concurrent>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Concurrent${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Svg>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Svg${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Quick>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Quick${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Qml>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Qml${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::QmlModels>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5QmlModels${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::QmlWorkerScript>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5QmlWorkerScript${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::Widgets>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5Widgets${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::QuickWidgets>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5QuickWidgets${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            $<TARGET_FILE:Qt5::PrintSupport>
-        DESTINATION
-            .
-        COMPONENT
-            CNPM_RUNTIME
-        RENAME
-            libQt5PrintSupport${ROGII_SUFFIX}.so.5
-        EXCLUDE_FROM_ALL
-    )
 endif()
 
 if(WIN32)
@@ -536,6 +363,10 @@ endforeach()
 
 unset(
     COMPONENTS
+)
+
+unset(
+    COMPONENTS_TO_INSTALL
 )
 
 unset(
