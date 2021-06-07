@@ -8,6 +8,36 @@ if(
     )
 endif()
 
+# WORKAROUND: initialize only rogii submodules, because initialization of all submodules takes too much times and space
+
+find_package(
+    Git
+    REQUIRED
+)
+
+set(
+    ROGII_SUBMODULES_NAME
+    rogii
+)
+
+execute_process(
+    COMMAND
+        ${GIT_EXECUTABLE} submodule update --init --recursive ${ROGII_SUBMODULES_NAME}
+    RESULT_VARIABLE
+        INIT_ROGII_SUBMODULES_RESULT
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_LIST_DIR}/.."
+)
+
+if(NOT INIT_ROGII_SUBMODULES_RESULT EQUAL 0)
+    message(
+        FATAL_ERROR
+        "Failed to initialize '${ROGII_SUBMODULES_NAME}' submodules."
+    )
+endif()
+
+# WORKAROUND end
+
 set(
     BUILD
     0
