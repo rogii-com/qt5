@@ -172,6 +172,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             ${CMAKE_INSTALL_PREFIX}/bin/qmake
         COMMAND
             ./configure
+            -silent
             -prefix ${CMAKE_INSTALL_PREFIX} 
             -translationdir ${CMAKE_INSTALL_PREFIX}/translations
             -platform linux-g++
@@ -232,6 +233,7 @@ elseif(MSVC)
             ${CMAKE_INSTALL_PREFIX}/bin/qmake
         COMMAND
             cmd /C configure
+            -silent
             -prefix ${CMAKE_INSTALL_PREFIX}
             -translationdir ${CMAKE_INSTALL_PREFIX}/translations
             -platform win32-msvc
