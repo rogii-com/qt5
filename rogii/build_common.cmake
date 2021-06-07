@@ -114,14 +114,14 @@ endif()
 
 file(
     COPY
-        ${CMAKE_CURRENT_LIST_DIR}/../package.cmake
+        ${CMAKE_CURRENT_LIST_DIR}/package.cmake
     DESTINATION
         ${ROOT}/${PACKAGE_NAME}
 )
 
 file(
     COPY
-        ${CMAKE_CURRENT_LIST_DIR}/../qt.conf
+        ${CMAKE_CURRENT_LIST_DIR}/qt.conf
     DESTINATION
         ${ROOT}/${PACKAGE_NAME}/bin
 )
