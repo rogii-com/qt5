@@ -218,6 +218,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
             -qtlibinfix ${QT_SUFFIX}
             -no-icu
             -qt-libpng
+            -qt-zlib
             -openssl-runtime
             OPENSSL_PREFIX="${OPENSSL_INCLUDE_DIRECTROIES}/../"
             OPENSSL_LIBS="-l:${OPENSSL_FILENAME};-l:${CRYPTO_FILENAME}"
