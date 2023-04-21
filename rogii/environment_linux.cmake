@@ -16,3 +16,13 @@ CNPM_ADD_PACKAGE(
     TAG
         "gxx12.2.0"
 )
+CNPM_ADD_PACKAGE(
+    NAME
+        python
+    VERSION
+        3.7.13
+    BUILD_NUMBER
+        581
+    TAG
+        "gxx12.2.0"
+)
