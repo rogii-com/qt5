@@ -48,9 +48,16 @@ if(NOT PERL_RESULT EQUAL 0)
     )
 endif()
 
+
+get_target_property(
+    PYTHON_BINARY_PATH
+    Python::binary
+    IMPORTED_LOCATION
+)
+
 execute_process(
     COMMAND
-        python
+        ${PYTHON_BINARY_PATH}
         --version
     RESULT_VARIABLE
         PYTHON_RESULT
@@ -67,13 +74,13 @@ message(
 )
 
 if((NOT PYTHON_RESULT EQUAL 0) OR (
-    (NOT PYTHON_ALL_OUTPUT MATCHES "2\.7") AND
-    (NOT PYTHON_ALL_OUTPUT MATCHES "3\.6") AND
-    (NOT PYTHON_ALL_OUTPUT MATCHES "3\.8")
+    (NOT PYTHON_ALL_OUTPUT MATCHES "2\.7") AND 
+    (NOT PYTHON_ALL_OUTPUT MATCHES "3\.6") AND 
+    (NOT PYTHON_ALL_OUTPUT MATCHES "3\.7")
     ))
     message(
         FATAL_ERROR
-        "Python 2.7.x or 3.6.x is not in the PATH."
+        "Python 2.7.x or 3.6.x or 3.7.x is not in the PATH."
     )
 endif()
 

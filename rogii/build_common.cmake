@@ -82,7 +82,6 @@ endif()
 
 include(
     "${CMAKE_CURRENT_LIST_DIR}/version.cmake"
-		  
 )
 
 set(
@@ -102,7 +101,7 @@ file(
 
 execute_process(
     COMMAND
-       "${CMAKE_COMMAND}" -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${ROOT}/${PACKAGE_NAME} ../.. 
+        "${CMAKE_COMMAND}" -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${ROOT}/${PACKAGE_NAME}  ../.. 
     WORKING_DIRECTORY
         "${DEBUG_PATH}"
 )
