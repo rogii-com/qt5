@@ -66,7 +66,11 @@ message(
     "PYTHON_ALL_OUTPUT = ${PYTHON_ALL_OUTPUT}"
 )
 
-if((NOT PYTHON_RESULT EQUAL 0) OR ((NOT PYTHON_ALL_OUTPUT MATCHES "2\.7") AND (NOT PYTHON_ALL_OUTPUT MATCHES "3\.6")))
+if((NOT PYTHON_RESULT EQUAL 0) OR (
+    (NOT PYTHON_ALL_OUTPUT MATCHES "2\.7") AND
+    (NOT PYTHON_ALL_OUTPUT MATCHES "3\.6") AND
+    (NOT PYTHON_ALL_OUTPUT MATCHES "3\.8")
+    ))
     message(
         FATAL_ERROR
         "Python 2.7.x or 3.6.x is not in the PATH."
@@ -172,7 +176,7 @@ endif()
 
 execute_process(
     COMMAND
-        git apply rogii/*.patch
+        git apply rogii/10-fix-compilation-msvc17.8.patch
     WORKING_DIRECTORY
         ${PROJECT_SOURCE_DIR}
 )
