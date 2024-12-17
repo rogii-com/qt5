@@ -346,6 +346,38 @@ if(WIN32)
     endforeach()
 endif()
 
+if(LINUX)
+    set(
+            TARGETS_TO_INSTALL
+
+            QOffscreenIntegrationPlugin
+    )
+
+    foreach(plugin ${TARGETS_TO_INSTALL})
+        set(
+                COMPONENT_NAMES
+
+                CNPM_RUNTIME_Qt5_plugins_platforms_${plugin}
+                CNPM_RUNTIME_Qt5_plugins_platforms
+                CNPM_RUNTIME_Qt5_plugins
+                CNPM_RUNTIME_Qt5
+                CNPM_RUNTIME
+        )
+
+        foreach(COMPONENT_NAME ${COMPONENT_NAMES})
+            install(
+                    FILES
+                    $<TARGET_FILE:Qt5::${plugin}>
+                    DESTINATION
+                    "./platforms"
+                    COMPONENT
+                    ${COMPONENT_NAME}
+                    EXCLUDE_FROM_ALL
+            )
+        endforeach()
+    endforeach()
+endif()
+
 unset(
     TARGETS_TO_INSTALL
 )
