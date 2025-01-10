@@ -336,3 +336,9 @@
 	url = ../qtgraphs.git
 	branch = 6.8.1
 	status = addon
+[submodule "rogii/cnpm"]
+	path = rogii/cnpm
+	url = https://github.com/rogii-com/cnpm
+[submodule "rogii/utils"]
+	path = rogii/utils
+	url = https://github.com/rogii-com/cmake-utils
