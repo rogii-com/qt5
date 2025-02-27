@@ -89,27 +89,136 @@ set(
 )
 
 set(
-    DEBUG_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/../build/debug"
+    INIT_REPO_CMD
+    "-f \
+        --mirror https://github.com/qt/ \
+        --no-resolve-deps \
+        --no-optional-deps \
+        -submodules qtdoc,qtactiveqt,qt5compat,qtbase,qtdeclarative,qtimageformats,qtshadertools,qtsvg,qttranslations,qtwebsockets,qttools "
 )
 
-file(
-    MAKE_DIRECTORY
-    "${DEBUG_PATH}"
+if(UNIX)
+    execute_process(
+    COMMAND
+        bash -c "./init-repository ${INIT_REPO_CMD}"
+    RESULT_VARIABLE
+        INIT_REPOSITORY_RESULT
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_LIST_DIR}/.."
 )
+else()
+    execute_process(
+    COMMAND
+        cmd /c "init-repository ${INIT_REPO_CMD}"
+    RESULT_VARIABLE
+        INIT_REPOSITORY_RESULT
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_LIST_DIR}/.."
+)
+endif()
+
+if(NOT INIT_REPOSITORY_RESULT EQUAL 0)
+    message(
+        FATAL_ERROR
+        "Failed to initialize repository."
+    )
+endif()
+
+set(
+    QT_SUFFIX
+    "Rogii"
+)
+
+set(
+    CONFIGURE_CMD_ARGS
+    "-shared \
+-c++std c++20 \
+-debug-and-release \
+-force-debug-info \
+-separate-debug-info \
+-prefix ${ROOT}/${PACKAGE_NAME} \
+-qtlibinfix ${QT_SUFFIX} \
+-nomake examples \
+-nomake tests \
+-nomake benchmarks \
+-skip qt3d \
+-skip qtcanvas3d \
+-skip qtcharts \
+-skip qtcoap \
+-skip qtconnectivity \
+-skip qtdatavis3d \
+-skip qtfeedback \
+-skip qtgamepad \
+-skip qtgraphs \
+-skip qtgrpc \
+-skip qthttpserver \
+-skip qtlanguageserver \
+-skip qtlocation \
+-skip qtlottie \
+-skip qtmqtt \
+-skip qtmultimedia \
+-skip qtnetworkauth \
+-skip qtopcua \
+-skip qtpim \
+-skip qtpositioning \
+-skip qtqa \
+-skip qtquick3d \
+-skip qtquick3dphysics \
+-skip qtquickeffectmaker \
+-skip qtquicktimeline \
+-skip qtremoteobjects \
+-skip qtrepotools \
+-skip qtscxml \
+-skip qtsensors \
+-skip qtserialbus \
+-skip qtserialport \
+-skip qtspeech \
+-skip qtsystems \
+-skip qtvirtualkeyboard \
+-skip qtwayland \
+-skip qtwebchannel \
+-skip qtwebengine \
+-skip qtwebglplugin \
+-skip qtwebview \
+-no-icu \
+-no-dbus \
+"
+)
+
+if(UNIX)
+    execute_process(
+    COMMAND
+        bash -c "./configure \
+        ${CONFIGURE_CMD_ARGS} \
+        -platform linux-g++"
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_LIST_DIR}/.."
+)
+else()
+    execute_process(
+    COMMAND
+        cmd /c "configure.bat \
+        ${CONFIGURE_CMD_ARGS} \
+        -platform win32-msvc \
+        -sql-odbc"
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_LIST_DIR}/.."
+)
+endif()
 
 execute_process(
     COMMAND
-        "${CMAKE_COMMAND}" -G Ninja -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=${ROOT}/${PACKAGE_NAME}  ../.. 
+        "${CMAKE_COMMAND}" --build . --parallel
     WORKING_DIRECTORY
-        "${DEBUG_PATH}"
+        "${CMAKE_CURRENT_LIST_DIR}/.."
 )
 
+# Workaround https://gitlab.kitware.com/cmake/cmake/-/issues/21475
 execute_process(
     COMMAND
-        "${CMAKE_COMMAND}" --build .
+        ninja install
     WORKING_DIRECTORY
-        "${DEBUG_PATH}"
+        "${CMAKE_CURRENT_LIST_DIR}/.."
 )
 
 if(UNIX)
@@ -137,132 +246,17 @@ file(
 
 file(
     COPY
+        ${CMAKE_CURRENT_LIST_DIR}/../config.summary
+    DESTINATION
+        ${ROOT}/${PACKAGE_NAME}
+)
+
+file(
+    COPY
         ${CMAKE_CURRENT_LIST_DIR}/qt.conf
     DESTINATION
         ${ROOT}/${PACKAGE_NAME}/bin
 )
-
-# WORKAROUND: build and install quickcontrols2 separately to enable build with precompiled qml
-
-include(ProcessorCount)
-ProcessorCount(N)
-
-find_package(
-    Git
-    REQUIRED
-)
-
-set(
-    PROJECT_ROOT_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/.."
-)
-
-set(
-    QUICKCONTROLS2_ROOT_PATH
-    "${PROJECT_ROOT_PATH}/qtquickcontrols2"
-)
-
-set(
-    QT_TOOLS_PATH
-    "${ROOT}/${PACKAGE_NAME}/bin"
-)
-
-get_filename_component(
-    INSTALL_DIR_NAME
-    "${ROOT}"
-    NAME
-)
-
-if(WIN32)
-    set(
-        PLATFORM_BUILD_COMMAND
-        jom /j${N}
-    )
-    set(
-        PLATFORM_INSTALL_COMMAND
-        nmake install
-    )
-elseif(UNIX)
-    set(
-        PLATFORM_BUILD_COMMAND
-        make -j${N}
-    )
-    set(
-        PLATFORM_INSTALL_COMMAND
-        make install
-    )
-else()
-    message(
-        FATAL_ERROR
-        "Unknown platform."
-    )
-endif()
-
-execute_process(
-    COMMAND
-        "${QT_TOOLS_PATH}/qmake" -help
-    RESULT_VARIABLE
-        QMAKE_RESULT
-)
-
-if(NOT QMAKE_RESULT EQUAL 0)
-    message(
-        FATAL_ERROR
-        "Qmake not found in '${QT_TOOLS_PATH}'."
-    )
-endif()
-
-execute_process(
-    COMMAND
-        "${QT_TOOLS_PATH}/qmlcachegen" -h
-    RESULT_VARIABLE
-        QUICK_COMPILER_RESULT
-)
-
-if(NOT QUICK_COMPILER_RESULT EQUAL 0)
-    message(
-        FATAL_ERROR
-        "Quick compiler not found in '${QT_TOOLS_PATH}'."
-    )
-endif()
-
-# Clean is required to configure quickcontrols2 correctly
-execute_process(
-    COMMAND
-        ${GIT_EXECUTABLE} clean -fdx -e /${INSTALL_DIR_NAME}/
-    WORKING_DIRECTORY
-        "${PROJECT_ROOT_PATH}"
-)
-
-execute_process(
-    COMMAND
-        ${GIT_EXECUTABLE} clean -fdx
-    WORKING_DIRECTORY
-        "${QUICKCONTROLS2_ROOT_PATH}"
-)
-
-execute_process(
-    COMMAND
-        "${QT_TOOLS_PATH}/qmake"
-    WORKING_DIRECTORY
-        "${QUICKCONTROLS2_ROOT_PATH}"
-)
-
-execute_process(
-    COMMAND
-        ${PLATFORM_BUILD_COMMAND}
-    WORKING_DIRECTORY
-        "${QUICKCONTROLS2_ROOT_PATH}"
-)
-
-execute_process(
-    COMMAND
-        ${PLATFORM_INSTALL_COMMAND}
-    WORKING_DIRECTORY
-        "${QUICKCONTROLS2_ROOT_PATH}"
-)
-
-# WORKAROUND end
 
 execute_process(
     COMMAND
