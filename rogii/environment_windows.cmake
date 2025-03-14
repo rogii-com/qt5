@@ -5,11 +5,11 @@ CNPM_ADD_PACKAGE(
     NAME
         OpenSSL
     VERSION
-        1.1.1.7
+        1.1.1.22
     BUILD_NUMBER
-        0
+        7
     TAG
-        "sdk18362_vsbt19"
+        "sdk20348_vsbt22"
 )
 
 CNPM_ADD_PACKAGE(

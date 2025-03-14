@@ -10,9 +10,9 @@ CNPM_ADD_PACKAGE(
     NAME
         OpenSSL
     VERSION
-        1.1.1.7
+        1.1.1.22
     BUILD_NUMBER
-        584
+        1356
     TAG
         "gxx12.2.0"
 )
