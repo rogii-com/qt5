@@ -398,36 +398,6 @@ if(WIN32)
             )
         endforeach()
     endforeach()
-
-    set(
-        TARGETS_TO_INSTALL
-
-        QTlsBackendOpenSSLPlugin
-    )
-
-    foreach(plugin ${TARGETS_TO_INSTALL})
-        set(
-            COMPONENT_NAMES
-
-            CNPM_RUNTIME_Qt6_plugins_tls_${plugin}
-            CNPM_RUNTIME_Qt6_plugins_tls
-            CNPM_RUNTIME_Qt6_plugins
-            CNPM_RUNTIME_Qt6
-            CNPM_RUNTIME
-        )
-
-        foreach(COMPONENT_NAME ${COMPONENT_NAMES})
-            install(
-                FILES
-                    $<TARGET_FILE:Qt6::${plugin}>
-                DESTINATION
-                    "./tls"
-                COMPONENT
-                    ${COMPONENT_NAME}
-                EXCLUDE_FROM_ALL
-            )
-        endforeach()
-    endforeach()
 endif()
 
 unset(
