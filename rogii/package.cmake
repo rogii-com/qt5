@@ -61,7 +61,6 @@ set(
     QuickControls2
     QuickControls2Universal
     QuickControls2UniversalStyleImpl
-    QuickControls2WindowsStyleImpl
     QuickDialogs2QuickImpl
     QuickDialogs2
     QuickDialogs2Utils
@@ -83,6 +82,10 @@ set(
     Widgets
     Xml
 )
+
+if(WIN32)
+list(APPEND COMPONENTS_TO_INSTALL QuickControls2WindowsStyleImpl)
+endif()
 
 set(
     COMPONENTS
@@ -392,6 +395,36 @@ if(WIN32)
                     $<TARGET_FILE:Qt6::${plugin}>
                 DESTINATION
                     "./styles"
+                COMPONENT
+                    ${COMPONENT_NAME}
+                EXCLUDE_FROM_ALL
+            )
+        endforeach()
+    endforeach()
+elseif(LINUX)
+    set(
+        TARGETS_TO_INSTALL
+
+        QNetworkManagerNetworkInformationPlugin
+    )
+
+    foreach(plugin ${TARGETS_TO_INSTALL})
+        set(
+            COMPONENT_NAMES
+
+            CNPM_RUNTIME_Qt6_plugins_networkinformation_${plugin}
+            CNPM_RUNTIME_Qt6_plugins_networkinformation
+            CNPM_RUNTIME_Qt6_plugins
+            CNPM_RUNTIME_Qt6
+            CNPM_RUNTIME
+        )
+
+        foreach(COMPONENT_NAME ${COMPONENT_NAMES})
+            install(
+                FILES
+                    $<TARGET_FILE:Qt6::${plugin}>
+                DESTINATION
+                    "./networkinformation"
                 COMPONENT
                     ${COMPONENT_NAME}
                 EXCLUDE_FROM_ALL
