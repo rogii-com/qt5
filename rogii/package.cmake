@@ -68,6 +68,7 @@ set(
     QuickLayouts
     QuickParticlesPrivate
     Quick
+    QuickShapes
     QuickShapesPrivate
     QuickTemplates2
     QuickTest
@@ -81,6 +82,7 @@ set(
     WebSockets
     Widgets
     Xml
+    StateMachine
 )
 
 if(WIN32)
