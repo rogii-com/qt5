@@ -94,7 +94,7 @@ set(
         --mirror https://github.com/qt/ \
         --no-resolve-deps \
         --no-optional-deps \
-        -submodules qtdoc,qtactiveqt,qt5compat,qtbase,qtdeclarative,qtimageformats,qtshadertools,qtsvg,qttranslations,qtwebsockets,qttools "
+        -submodules qtdoc,qtactiveqt,qt5compat,qtbase,qtdeclarative,qtimageformats,qtshadertools,qtsvg,qttranslations,qtwebsockets,qttools,qtscxml "
 )
 
 if(UNIX)
@@ -168,7 +168,6 @@ set(
 -skip qtquicktimeline \
 -skip qtremoteobjects \
 -skip qtrepotools \
--skip qtscxml \
 -skip qtsensors \
 -skip qtserialbus \
 -skip qtserialport \
