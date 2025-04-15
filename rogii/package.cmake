@@ -68,7 +68,6 @@ set(
     QuickLayouts
     QuickParticlesPrivate
     Quick
-    QuickShapes
     QuickShapesPrivate
     QuickTemplates2
     QuickTest
