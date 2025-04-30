@@ -82,6 +82,7 @@ set(
     Widgets
     Xml
     StateMachine
+    ShaderTools
 )
 
 if(WIN32)
