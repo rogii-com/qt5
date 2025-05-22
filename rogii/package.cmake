@@ -315,33 +315,47 @@ if(WIN32)
     endforeach()
 
     set(
-        TARGETS_TO_INSTALL
+        COMPONENT_NAMES
 
-        QNLMNIPlugin
+        CNPM_RUNTIME_Qt6_plugins_networkinformation_QNLMNIPlugin
+        CNPM_RUNTIME_Qt6_plugins_networkinformation
+        CNPM_RUNTIME_Qt6_plugins
+        CNPM_RUNTIME_Qt6
+        CNPM_RUNTIME
     )
 
-    foreach(plugin ${TARGETS_TO_INSTALL})
-        set(
-            COMPONENT_NAMES
-
-            CNPM_RUNTIME_Qt6_plugins_networkinformation_${plugin}
-            CNPM_RUNTIME_Qt6_plugins_networkinformation
-            CNPM_RUNTIME_Qt6_plugins
-            CNPM_RUNTIME_Qt6
-            CNPM_RUNTIME
+    foreach(COMPONENT_NAME ${COMPONENT_NAMES})
+        install(
+            FILES
+                $<TARGET_FILE:Qt6::QNLMNIPlugin>
+            DESTINATION
+                "./networkinformation"
+            COMPONENT
+                ${COMPONENT_NAME}
+            EXCLUDE_FROM_ALL
         )
+    endforeach()
 
-        foreach(COMPONENT_NAME ${COMPONENT_NAMES})
-            install(
-                FILES
-                    $<TARGET_FILE:Qt6::${plugin}>
-                DESTINATION
-                    "./networkinformation"
-                COMPONENT
-                    ${COMPONENT_NAME}
-                EXCLUDE_FROM_ALL
-            )
-        endforeach()
+    set(
+        COMPONENT_NAMES
+
+        CNPM_RUNTIME_Qt6_plugins_networkinformation_QSchannelBackendPlugin
+        CNPM_RUNTIME_Qt6_plugins_networkinformation
+        CNPM_RUNTIME_Qt6_plugins
+        CNPM_RUNTIME_Qt6
+        CNPM_RUNTIME
+    )
+
+    foreach(COMPONENT_NAME ${COMPONENT_NAMES})
+        install(
+            FILES
+                $<TARGET_FILE:Qt6::QSchannelBackendPlugin>
+            DESTINATION
+                "./tls"
+            COMPONENT
+                ${COMPONENT_NAME}
+            EXCLUDE_FROM_ALL
+        )
     endforeach()
 
     set(
