@@ -1,21 +1,6 @@
 set(
-    MODULE_PATH_BACKUP33333399999
-    "${CMAKE_MODULE_PATH}"
-)
-
-set(
-    CMAKE_MODULE_PATH
-    ""
-)
-
-set(
     ROGII_SUFFIX
     "Rogii"
-)
-
-set(
-    PREFIX_PATH_BACKUP33333399999
-    "${CMAKE_PREFIX_PATH}"
 )
 
 set(
@@ -110,24 +95,6 @@ find_package(
 )
 
 set(
-    CMAKE_MODULE_PATH
-    "${MODULE_PATH_BACKUP33333399999}"
-)
-
-unset(
-    MODULE_PATH_BACKUP33333399999
-)
-
-set(
-    CMAKE_PREFIX_PATH
-    "${PREFIX_PATH_BACKUP33333399999}"
-)
-
-unset(
-    PREFIX_PATH_BACKUP33333399999
-)
-
-set(
     TARGETS_TO_INSTALL
     ${COMPONENTS_TO_INSTALL}
 )
@@ -182,6 +149,9 @@ if(WIN32)
                 "*d.dll"
                 EXCLUDE
             PATTERN
+                "*.qml"
+                EXCLUDE
+            PATTERN
                 "*.qmlc"
                 EXCLUDE
             PATTERN
@@ -204,6 +174,9 @@ if(WIN32)
             EXCLUDE_FROM_ALL
             COMPONENT
                 ${COMPONENT_NAME}
+            PATTERN
+                "*.qml"
+                EXCLUDE
             PATTERN
                 "*.qmlc"
                 EXCLUDE
