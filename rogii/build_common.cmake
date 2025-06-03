@@ -138,6 +138,7 @@ set(
 -separate-debug-info \
 -prefix ${ROOT}/${PACKAGE_NAME} \
 -qtlibinfix ${QT_SUFFIX} \
+-qt-zlib \
 -nomake examples \
 -nomake tests \
 -nomake benchmarks \
