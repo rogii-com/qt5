@@ -251,11 +251,10 @@ file(
         ${ROOT}/${PACKAGE_NAME}
 )
 
-file(
-    COPY
-        ${CMAKE_CURRENT_LIST_DIR}/qt.conf
-    DESTINATION
-        ${ROOT}/${PACKAGE_NAME}/bin
+configure_file(
+  ${CMAKE_CURRENT_LIST_DIR}/qt.conf.in
+  ${ROOT}/${PACKAGE_NAME}/bin/qt.conf
+  @ONLY
 )
 
 execute_process(

@@ -135,9 +135,9 @@ if(WIN32)
         # pattern to exclude debug dlls may fail, I mean it
         install(
             DIRECTORY
-                $<TARGET_FILE_DIR:Qt6::Core>/../qml
+                $<TARGET_FILE_DIR:Qt6::Core>/../qml/
             DESTINATION
-                .
+                "qml/${QT_VERSION}"
             CONFIGURATIONS
                 MinSizeRel
                 RelWithDebInfo
@@ -166,9 +166,9 @@ if(WIN32)
         # is good enough
         install(
             DIRECTORY
-                $<TARGET_FILE_DIR:Qt6::Core>/../qml
+                $<TARGET_FILE_DIR:Qt6::Core>/../qml/
             DESTINATION
-                .
+                "qml/${QT_VERSION}"
             CONFIGURATIONS
                 Debug
             EXCLUDE_FROM_ALL
@@ -183,6 +183,16 @@ if(WIN32)
             PATTERN
                 "*.pdb"
                 EXCLUDE
+        )
+
+        install(
+            FILES
+                "$<TARGET_FILE_DIR:Qt6::Core>/qt.conf"
+            DESTINATION
+                .
+            COMPONENT
+                ${COMPONENT_NAME}
+            EXCLUDE_FROM_ALL
         )
     endforeach()
 endif()
