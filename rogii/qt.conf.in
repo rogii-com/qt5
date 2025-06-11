@@ -1,2 +1,2 @@
 [Paths]
-Qml2Imports=qml/@ROGII_PKG_VERSION@
+QmlImports=qml/@ROGII_PKG_VERSION@
