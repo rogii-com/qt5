@@ -187,12 +187,14 @@ if(WIN32)
 
         install(
             FILES
-                "$<TARGET_FILE_DIR:Qt6::Core>/qt.conf"
+                "$<TARGET_FILE_DIR:Qt6::Core>/qt-install.conf"
             DESTINATION
                 .
             COMPONENT
                 ${COMPONENT_NAME}
             EXCLUDE_FROM_ALL
+            RENAME
+                 qt.conf
         )
     endforeach()
 endif()

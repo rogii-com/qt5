@@ -1,2 +1,3 @@
 [Paths]
-QmlImports=qml/@ROGII_PKG_VERSION@
+Prefix=@APP_EXEC_PREFIX_OVERRIDE@
+QmlImports=@QML_IMPORT_PATH_OVERRIDE@

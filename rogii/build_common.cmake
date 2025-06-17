@@ -251,9 +251,19 @@ file(
         ${ROOT}/${PACKAGE_NAME}
 )
 
+set(APP_EXEC_PREFIX_OVERRIDE "../")
+set(QML_IMPORT_PATH_OVERRIDE "qml/")
 configure_file(
   ${CMAKE_CURRENT_LIST_DIR}/qt.conf.in
   ${ROOT}/${PACKAGE_NAME}/bin/qt.conf
+  @ONLY
+)
+
+set(APP_EXEC_PREFIX_OVERRIDE "./")
+set(QML_IMPORT_PATH_OVERRIDE "qml/${ROGII_PKG_VERSION}")
+configure_file(
+  ${CMAKE_CURRENT_LIST_DIR}/qt.conf.in
+  ${ROOT}/${PACKAGE_NAME}/bin/qt-install.conf
   @ONLY
 )
 
