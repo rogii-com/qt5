@@ -19,52 +19,52 @@ class QtRogiiConan(ConanFile):
     def generate(self):
         # https://github.com/qt/qtbase/blob/dev/cmake/configure-cmake-mapping.md
         qt_config = [
+            "BUILD_SHARED_LIBS=ON",
             "QT_BUILD_BENCHMARKS=OFF",
             "QT_BUILD_EXAMPLES=OFF",
-            "BUILD_SHARED_LIBS=ON",
             "QT_BUILD_TESTS=OFF",
-            "FEATURE_dbus=OFF",
-            "FEATURE_icu=OFF",
-            "FEATURE_qt3d=OFF",
-            "FEATURE_qtcanvas3d=OFF",
-            "FEATURE_qtcharts=OFF",
-            "FEATURE_qtcoap=OFF",
-            "FEATURE_qtconnectivity=OFF",
-            "FEATURE_qtdatavis3d=OFF",
-            "FEATURE_qtfeedback=OFF",
-            "FEATURE_qtgamepad=OFF",
-            "FEATURE_qtgraphs=OFF",
-            "FEATURE_qtgrpc=OFF",
-            "FEATURE_qthttpserver=OFF",
-            "FEATURE_qtlanguageserver=OFF",
-            "FEATURE_qtlocation=OFF",
-            "FEATURE_qtlottie=OFF",
-            "FEATURE_qtmqtt=OFF",
-            "FEATURE_qtmultimedia=OFF",
-            "FEATURE_qtnetworkauth=OFF",
-            "FEATURE_qtopcua=OFF",
-            "FEATURE_qtpim=OFF",
-            "FEATURE_qtpositioning=OFF",
-            "FEATURE_qtqa=OFF",
-            "FEATURE_qtquick3d=OFF",
-            "FEATURE_qtquick3dphysics=OFF",
-            "FEATURE_qtquickeffectmaker=OFF",
-            "FEATURE_qtquicktimeline=OFF",
-            "FEATURE_qtremoteobjects=OFF",
-            "FEATURE_qtrepotools=OFF",
-            "FEATURE_qtsensors=OFF",
-            "FEATURE_qtserialbus=OFF",
-            "FEATURE_qtserialport=OFF",
-            "FEATURE_qtspeech=OFF",
-            "FEATURE_qtsystems=OFF",
-            "FEATURE_qtvirtualkeyboard=OFF",
-            "FEATURE_qtwayland=OFF",
-            "FEATURE_qtwebchannel=OFF",
-            "FEATURE_qtwebengine=OFF",
-            "FEATURE_qtwebglplugin=OFF",
-            "FEATURE_qtwebview=OFF",
-            "FEATURE_zlib=qt",
-            "QT_LIBINFIX=Rogii"
+            "FEATURE_system_zlib=OFF",
+            "QT_LIBINFIX=Rogii",
+            "BUILD_qt3d=OFF",
+            "BUILD_qtcanvas3d=OFF",
+            "BUILD_qtcharts=OFF",
+            "BUILD_qtcoap=OFF",
+            "BUILD_qtconnectivity=OFF",
+            "BUILD_qtdatavis3d=OFF",
+            "BUILD_qtfeedback=OFF",
+            "BUILD_qtgamepad=OFF",
+            "BUILD_qtgraphs=OFF",
+            "BUILD_qtgrpc=OFF",
+            "BUILD_qthttpserver=OFF",
+            "BUILD_qtlanguageserver=OFF",
+            "BUILD_qtlocation=OFF",
+            "BUILD_qtlottie=OFF",
+            "BUILD_qtmqtt=OFF",
+            "BUILD_qtmultimedia=OFF",
+            "BUILD_qtnetworkauth=OFF",
+            "BUILD_qtopcua=OFF",
+            "BUILD_qtpim=OFF",
+            "BUILD_qtpositioning=OFF",
+            "BUILD_qtqa=OFF",
+            "BUILD_qtquick3d=OFF",
+            "BUILD_qtquick3dphysics=OFF",
+            "BUILD_qtquickeffectmaker=OFF",
+            "BUILD_qtquicktimeline=OFF",
+            "BUILD_qtremoteobjects=OFF",
+            "BUILD_qtrepotools=OFF",
+            "BUILD_qtsensors=OFF",
+            "BUILD_qtserialbus=OFF",
+            "BUILD_qtserialport=OFF",
+            "BUILD_qtspeech=OFF",
+            "BUILD_qtsystems=OFF",
+            "BUILD_qtvirtualkeyboard=OFF",
+            "BUILD_qtwayland=OFF",
+            "BUILD_qtwebchannel=OFF",
+            "BUILD_qtwebengine=OFF",
+            "BUILD_qtwebglplugin=OFF",
+            "BUILD_qtwebview=OFF",
+            "BUILD_icu=OFF",
+            "BUILD_dbus=OFF",
         ]
 
         if self.settings.os == "Windows":
@@ -79,11 +79,13 @@ class QtRogiiConan(ConanFile):
             key, value = kv.split("=", 1)
             tc.variables[key] = value
 
-        tc.variables["CMAKE_OBJECT_PATH_MAX"] = 1024
+        if self.settings.os == "Windows":
+            tc.variables["CMAKE_OBJECT_PATH_MAX"] = 1024
+
         tc.absolute_paths = True
 
         tc.generate()
-    
+
     def build(self):
         init_repo_args = (
             "-f "
@@ -108,7 +110,7 @@ class QtRogiiConan(ConanFile):
     def package(self):
         cmake = CMake(self)
         cmake.install()
-    
+
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "Qt6")
         self.cpp_info.bindirs = ["bin"]
