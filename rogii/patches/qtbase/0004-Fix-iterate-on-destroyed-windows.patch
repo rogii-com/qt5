@@ -1,0 +1,35 @@
+
+
+diff --git a/src/gui/kernel/qwindowsysteminterface.cpp b/src/gui/kernel/qwindowsysteminterface.cpp
+index 8e14ee09efc..14e6e5c93d1 100644
+--- a/src/gui/kernel/qwindowsysteminterface.cpp
++++ b/src/gui/kernel/qwindowsysteminterface.cpp
+@@ -16,6 +16,8 @@
+ #include <QtCore/qscopedvaluerollback.h>
+ #include <QtCore/private/qlocking_p.h>
+ 
++#include <vector>
++
+ #if QT_CONFIG(draganddrop)
+ #include <qpa/qplatformdrag.h>
+ #endif
+@@ -760,9 +762,16 @@ void QWindowSystemInterface::handleScreenRemoved(QPlatformScreen *platformScreen
+                 && newPrimaryScreen->handle()->virtualSiblings().contains(platformScreen);
+ 
+             // Move any leftover windows to the primary screen
+-            const auto allWindows = QGuiApplication::allWindows();
+-            for (QWindow *window : allWindows) {
+-                if (!window->isTopLevel() || window->screen() != screen)
++            const auto & allWindowRawPtrs = QGuiApplication::allWindows();
++
++            std::vector<QPointer<QWindow>> allWindowPointers;
++            allWindowPointers.reserve(allWindowRawPtrs.size());
++
++            for (QWindow *rawWindowPtr : allWindowRawPtrs)
++                allWindowPointers.emplace_back(rawWindowPtr);
++
++            for (auto window : allWindowPointers) {
++                if (!window || !window->isTopLevel() || window->screen() != screen)
+                     continue;
+ 
+                 const bool wasVisible = window->isVisible();
