@@ -20,9 +20,9 @@ class QtRogiiConan(ConanFile):
         # https://github.com/qt/qtbase/blob/dev/cmake/configure-cmake-mapping.md
         qt_config = [
             "BUILD_SHARED_LIBS=ON",
-            "QT_BUILD_BENCHMARKS=OFF",
-            "QT_BUILD_EXAMPLES=OFF",
-            "QT_BUILD_TESTS=OFF",
+            "QT_BUILD_BENCHMARKS=FALSE",
+            "QT_BUILD_EXAMPLES=FALSE",
+            "QT_BUILD_TESTS=FALSE",
             "FEATURE_system_zlib=OFF",
             "QT_LIBINFIX=Rogii",
             "BUILD_qt3d=OFF",
@@ -63,8 +63,9 @@ class QtRogiiConan(ConanFile):
             "BUILD_qtwebengine=OFF",
             "BUILD_qtwebglplugin=OFF",
             "BUILD_qtwebview=OFF",
-            "BUILD_icu=OFF",
-            "BUILD_dbus=OFF",
+            "FEATURE_icu=OFF",
+            "FEATURE_dbus=OFF",
+            "FEATURE_separate_debug_info=ON"
         ]
 
         if self.settings.os == "Windows":
