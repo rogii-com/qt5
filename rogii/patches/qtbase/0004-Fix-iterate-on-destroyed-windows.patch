@@ -59,6 +59,6 @@ index 277c234e339..fe3767fff62 100644
 +            if (!w)
 +                continue;
 +
-             if (w->screen() == screen && w->handle() && w->type() != Qt::Desktop) {
+             if (w->screen() == screen && w->handle()) {
                  if (w->isVisible() && w->windowState() != Qt::WindowMinimized
                      && (QWindowsWindow::baseWindowOf(w)->exStyle() & WS_EX_TOOLWINDOW)) {
