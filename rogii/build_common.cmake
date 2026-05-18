@@ -124,6 +124,9 @@ if(NOT INIT_REPOSITORY_RESULT EQUAL 0)
     )
 endif()
 
+include("${CMAKE_CURRENT_LIST_DIR}/../rogii/apply_patches.cmake")
+apply_patches("${CMAKE_CURRENT_LIST_DIR}/../rogii/patches")
+
 set(
     QT_SUFFIX
     "Rogii"

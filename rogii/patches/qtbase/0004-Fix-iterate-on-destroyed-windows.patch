@@ -1,0 +1,64 @@
+diff --git a/src/gui/kernel/qwindowsysteminterface.cpp b/src/gui/kernel/qwindowsysteminterface.cpp
+index 8e14ee09efc..1e83c71284d 100644
+--- a/src/gui/kernel/qwindowsysteminterface.cpp
++++ b/src/gui/kernel/qwindowsysteminterface.cpp
+@@ -16,6 +16,8 @@
+ #include <QtCore/qscopedvaluerollback.h>
+ #include <QtCore/private/qlocking_p.h>
+ 
++#include <vector>
++
+ #if QT_CONFIG(draganddrop)
+ #include <qpa/qplatformdrag.h>
+ #endif
+@@ -760,9 +762,16 @@ void QWindowSystemInterface::handleScreenRemoved(QPlatformScreen *platformScreen
+                 && newPrimaryScreen->handle()->virtualSiblings().contains(platformScreen);
+ 
+             // Move any leftover windows to the primary screen
+-            const auto allWindows = QGuiApplication::allWindows();
+-            for (QWindow *window : allWindows) {
+-                if (!window->isTopLevel() || window->screen() != screen)
++            const auto & allWindowRawPtrs = QGuiApplication::allWindows();
++
++            std::vector<QPointer<QWindow>> allWindowPointers;
++            allWindowPointers.reserve(allWindowRawPtrs.size());
++
++            for (QWindow *rawWindowPtr : allWindowRawPtrs)
++                allWindowPointers.emplace_back(rawWindowPtr);
++
++            for (const auto & window : allWindowPointers) {
++                if (!window || !window->isTopLevel() || window->screen() != screen)
+                     continue;
+ 
+                 const bool wasVisible = window->isVisible();
+diff --git a/src/plugins/platforms/windows/qwindowsscreen.cpp b/src/plugins/platforms/windows/qwindowsscreen.cpp
+index 277c234e339..fe3767fff62 100644
+--- a/src/plugins/platforms/windows/qwindowsscreen.cpp
++++ b/src/plugins/platforms/windows/qwindowsscreen.cpp
+@@ -27,6 +27,7 @@
+ 
+ #include <memory>
+ #include <type_traits>
++#include <vector>
+ 
+ #include <cfgmgr32.h>
+ #include <setupapi.h>
+@@ -778,7 +779,17 @@ void QWindowsScreenManager::removeScreen(int index)
+     if (screen != primaryScreen) {
+         unsigned movedWindowCount = 0;
+         const QWindowList tlws = QGuiApplication::topLevelWindows();
+-        for (QWindow *w : tlws) {
++
++        std::vector<QPointer<QWindow>> tlwPointers;
++        tlwPointers.reserve(tlws.size());
++
++        for (QWindow *rawWindowPtr : tlws)
++            tlwPointers.emplace_back(rawWindowPtr);
++
++        for (const auto & w : tlwPointers) {
++            if (!w)
++                continue;
++
+             if (w->screen() == screen && w->handle() && w->type() != Qt::Desktop) {
+                 if (w->isVisible() && w->windowState() != Qt::WindowMinimized
+                     && (QWindowsWindow::baseWindowOf(w)->exStyle() & WS_EX_TOOLWINDOW)) {

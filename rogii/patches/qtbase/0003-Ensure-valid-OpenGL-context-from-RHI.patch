@@ -1,0 +1,18 @@
+
+
+diff --git a/src/gui/rhi/qrhigles2.cpp b/src/gui/rhi/qrhigles2.cpp
+index ea6dfdac3b0..826cbe9839b 100644
+--- a/src/gui/rhi/qrhigles2.cpp
++++ b/src/gui/rhi/qrhigles2.cpp
+@@ -627,6 +627,11 @@ QSurface *QRhiGles2::evaluateFallbackSurface() const
+ 
+ bool QRhiGles2::ensureContext(QSurface *surface) const
+ {
++    if (!ctx->isValid()) {
++        contextLost = true;
++        return false;
++    }
++
+     if (!surface) {
+         // null means any surface is good because not going to render
+         if (currentSurfaceForCurrentContext(ctx))
