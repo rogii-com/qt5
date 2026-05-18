@@ -10,7 +10,7 @@ set(
 
 set(
     QT_VERSION
-    6.8.3
+    6.11.1
 )
 
 set(
