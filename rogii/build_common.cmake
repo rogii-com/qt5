@@ -132,10 +132,18 @@ set(
     "Rogii"
 )
 
+# MSVC. avoid C++20 constinit issues (e.g. Bootstrap/qregularexpression.cpp).
+# https://codereview.qt-project.org/c/qt/qtbase/+/423835
+if(WIN32)
+    set(QT_CXX_STD c++17)
+else()
+    set(QT_CXX_STD c++20)
+endif()
+
 set(
     CONFIGURE_CMD_ARGS
     "-shared \
--c++std c++20 \
+-c++std ${QT_CXX_STD} \
 -debug-and-release \
 -force-debug-info \
 -separate-debug-info \
