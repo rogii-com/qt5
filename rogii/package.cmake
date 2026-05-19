@@ -83,6 +83,7 @@ set(
     QmlCompiler
     UiPlugin
     UiTools
+    WidgetsPrivate
 )
 
 find_package(
