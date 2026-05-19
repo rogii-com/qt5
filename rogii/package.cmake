@@ -49,11 +49,11 @@ set(
     QuickDialogs2QuickImpl
     QuickDialogs2
     QuickDialogs2Utils
-    QuickEffectsPrivate
+    QuickEffects
     QuickLayouts
     QuickParticlesPrivate
     Quick
-    QuickShapesPrivate
+    QuickShapes
     QuickTemplates2
     QuickTest
     QuickVectorImageGeneratorPrivate
