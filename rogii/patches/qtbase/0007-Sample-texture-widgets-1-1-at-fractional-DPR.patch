@@ -1,0 +1,45 @@
+diff --git a/src/gui/painting/qbackingstoredefaultcompositor.cpp b/src/gui/painting/qbackingstoredefaultcompositor.cpp
+index 9b21900..4c21105 100644
+--- a/src/gui/painting/qbackingstoredefaultcompositor.cpp
++++ b/src/gui/painting/qbackingstoredefaultcompositor.cpp
+@@ -229,15 +229,32 @@ static bool prepareDrawForRenderToTextureWidget(const QPlatformTextureList *text
+     rectInWindow.translate(-offset);
+ 
+     const QRect clippedRectInWindow = rectInWindow & clipRect.translated(rectInWindow.topLeft());
+-    const QRect srcRect = toBottomLeftRect(clipRect, rectInWindow.height());
+-
+-    *target = targetTransform(scaledRect(clippedRectInWindow, window->devicePixelRatio()),
+-                              deviceWindowRect,
+-                              invertTargetY);
++    const qreal dpr = window->devicePixelRatio();
++    const QRect deviceRectInWindow = scaledRect(rectInWindow, dpr);
++    const QRect deviceClippedRect = scaledRect(clippedRectInWindow, dpr);
++    const SourceTransformOrigin sourceOrigin = invertSource ? SourceTransformOrigin::TopLeft
++                                                            : SourceTransformOrigin::BottomLeft;
++
++    *target = targetTransform(deviceClippedRect, deviceWindowRect, invertTargetY);
++
++    // Rogii: the target is rounded at the window's device edges, so it can differ by one pixel from a texture rendered
++    // at size * dpr; stretching the texture over it drops or doubles a texel row or column mid-texture (Nearest
++    // sampling). A texture within that rounding difference is sampled 1:1 from its top-left corner instead; any other
++    // size (downscaling, fixed-size texture widgets) keeps being fitted to the target.
++    static_assert(QT_VERSION < QT_VERSION_CHECK(6, 12, 0),
++                  "Rogii-only change on top of qtbase 84cabde0ffb (QTBUG-147329): Qt 6.12 still stretches texture "
++                  "widgets in prepareDrawForRenderToTextureWidget; re-check upstream and port or drop this patch.");
++    const QRhiTexture *texture = textures->texture(idx);
++    const QSize textureSize = texture ? texture->pixelSize() : deviceRectInWindow.size();
++    const QSize sizeDifference = textureSize - deviceRectInWindow.size();
++    if (qAbs(sizeDifference.width()) <= 1 && qAbs(sizeDifference.height()) <= 1) {
++        const QRect deviceClipRect = deviceClippedRect.translated(-deviceRectInWindow.topLeft());
++        *source = sourceTransform(toBottomLeftRect(deviceClipRect, textureSize.height()), textureSize, sourceOrigin);
++        return true;
++    }
+ 
+-    *source = sourceTransform(scaledRect(srcRect, window->devicePixelRatio()),
+-                              scaledRect(rectInWindow, window->devicePixelRatio()).size(),
+-                              invertSource ? SourceTransformOrigin::TopLeft : SourceTransformOrigin::BottomLeft);
++    const QRect srcRect = toBottomLeftRect(clipRect, rectInWindow.height());
++    *source = sourceTransform(scaledRect(srcRect, dpr), deviceRectInWindow.size(), sourceOrigin);
+ 
+     return true;
+ }
