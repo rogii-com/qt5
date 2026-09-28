@@ -1,0 +1,22 @@
+diff --git a/src/gui/painting/qbackingstoredefaultcompositor.cpp b/src/gui/painting/qbackingstoredefaultcompositor.cpp
+--- a/src/gui/painting/qbackingstoredefaultcompositor.cpp
++++ b/src/gui/painting/qbackingstoredefaultcompositor.cpp
+@@ -548,8 +548,16 @@ QPlatformBackingStore::FlushResult QBackingStoreDefaultCompositor::flush(QPlatfo
+         origin = SourceTransformOrigin::BottomLeft;
+ 
+     const qreal dpr = window->devicePixelRatio();
+-    const QRect deviceWindowRect = scaledRect(QRect(QPoint(), window->size()), dpr);
+-    const QRect sourceWindowRect = scaledRect(QRect(QPoint(), window->size()), sourceDevicePixelRatio);
++    QRect deviceWindowRect = scaledRect(QRect(QPoint(), window->size()), dpr);
++    QRect sourceWindowRect = scaledRect(QRect(QPoint(), window->size()), sourceDevicePixelRatio);
++    // The native surface size is not always representable as window->size() * dpr
++    // (rounded QWindow geometry). Map the backing store 1:1 from the top-left onto
++    // the real output instead of stretching it by a device pixel.
++    const QSize outputPixelSize = swapchain->currentPixelSize();
++    if (!outputPixelSize.isEmpty() && outputPixelSize != deviceWindowRect.size()) {
++        deviceWindowRect = QRect(QPoint(), outputPixelSize);
++        sourceWindowRect = scaledRect(deviceWindowRect, sourceDevicePixelRatio / dpr);
++    }
+     // If sourceWindowRect is larger than deviceWindowRect, we are doing high
+     // DPI downscaling. In that case Linear filtering is a must, whereas for the
+     // 1:1 case Nearest must be used for Qt 5 visual compatibility.
