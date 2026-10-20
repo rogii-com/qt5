@@ -97,6 +97,15 @@ set(
         -submodules qtdoc,qtactiveqt,qt5compat,qtbase,qtdeclarative,qtimageformats,qtshadertools,qtsvg,qttranslations,qtwebsockets,qttools,qtscxml "
 )
 
+# init-repository.bat loses the exit code of its CMake script, so success is read from the
+# marker that script sets on completion; a marker left over from an earlier run must not count.
+execute_process(
+    COMMAND
+        ${GIT_EXECUTABLE} config --unset initrepository.initialized
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_LIST_DIR}/.."
+)
+
 if(UNIX)
     execute_process(
     COMMAND
@@ -117,7 +126,20 @@ else()
 )
 endif()
 
-if(NOT INIT_REPOSITORY_RESULT EQUAL 0)
+execute_process(
+    COMMAND
+        ${GIT_EXECUTABLE} config --get initrepository.initialized
+    OUTPUT_VARIABLE
+        INIT_REPOSITORY_MARKER
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    WORKING_DIRECTORY
+        "${CMAKE_CURRENT_LIST_DIR}/.."
+)
+
+if(
+    NOT INIT_REPOSITORY_RESULT EQUAL 0
+    OR NOT INIT_REPOSITORY_MARKER STREQUAL "true"
+)
     message(
         FATAL_ERROR
         "Failed to initialize repository."
@@ -196,6 +218,8 @@ if(UNIX)
         -platform linux-g++"
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_LIST_DIR}/.."
+    COMMAND_ERROR_IS_FATAL
+        ANY
 )
 else()
     execute_process(
@@ -206,6 +230,8 @@ else()
         -sql-odbc"
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_LIST_DIR}/.."
+    COMMAND_ERROR_IS_FATAL
+        ANY
 )
 endif()
 
@@ -214,6 +240,8 @@ execute_process(
         "${CMAKE_COMMAND}" --build . --parallel
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_LIST_DIR}/.."
+    COMMAND_ERROR_IS_FATAL
+        ANY
 )
 
 # Workaround https://gitlab.kitware.com/cmake/cmake/-/issues/21475
@@ -222,6 +250,8 @@ execute_process(
         ninja install
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_LIST_DIR}/.."
+    COMMAND_ERROR_IS_FATAL
+        ANY
 )
 
 if(UNIX)
@@ -235,6 +265,8 @@ if(UNIX)
                     bash ${CMAKE_CURRENT_LIST_DIR}/utils/split_debug_info.sh "${file}"
                 WORKING_DIRECTORY
                     "${ROOT}/${PACKAGE_NAME}/lib/"
+                COMMAND_ERROR_IS_FATAL
+                    ANY
             )
         endif()
     endforeach()
@@ -275,5 +307,7 @@ execute_process(
         ${CMAKE_COMMAND} -E tar cf "${PACKAGE_NAME}.7z" --format=7zip -- "${PACKAGE_NAME}"
     WORKING_DIRECTORY
         ${ROOT}
+    COMMAND_ERROR_IS_FATAL
+        ANY
 )
 
