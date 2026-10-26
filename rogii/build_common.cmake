@@ -245,10 +245,24 @@ execute_process(
         ANY
 )
 
+set(
+    INSTALL_TARGET
+    install
+)
+
+# On Linux the Debug install fails on the missing libexec/Debug/syncqt.debug before installing
+# anything, so the package has always held the release configuration only.
+if(UNIX)
+    set(
+        INSTALL_TARGET
+        install:RelWithDebInfo
+    )
+endif()
+
 # Workaround https://gitlab.kitware.com/cmake/cmake/-/issues/21475
 execute_process(
     COMMAND
-        ninja install
+        ninja ${INSTALL_TARGET}
     WORKING_DIRECTORY
         "${CMAKE_CURRENT_LIST_DIR}/.."
     COMMAND_ERROR_IS_FATAL
