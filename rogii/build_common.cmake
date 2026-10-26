@@ -161,6 +161,7 @@ set(
 -debug-and-release \
 -force-debug-info \
 -separate-debug-info \
+-no-pch \
 -prefix ${ROOT}/${PACKAGE_NAME} \
 -qtlibinfix ${QT_SUFFIX} \
 -qt-zlib \
