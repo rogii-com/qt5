@@ -253,36 +253,20 @@ if(WIN32)
         QSvgPlugin
         QGifPlugin
     )
+elseif(LINUX)
+    set(
+        IMAGEFORMATS_TO_INSTALL
 
-    foreach(plugin ${IMAGEFORMATS_TO_INSTALL})
-        set(
-            COMPONENT_NAMES
+        QSvgPlugin
+    )
+endif()
 
-            CNPM_RUNTIME_Qt6_plugins_imageformats_${plugin}
-            CNPM_RUNTIME_Qt6_plugins_imageformats
-            CNPM_RUNTIME_Qt6_plugins
-            CNPM_RUNTIME_Qt6
-            CNPM_RUNTIME
-        )
-
-        foreach(COMPONENT_NAME ${COMPONENT_NAMES})
-            install(
-                FILES
-                    $<TARGET_FILE:Qt6::${plugin}>
-                DESTINATION
-                    "./imageformats"
-                COMPONENT
-                    ${COMPONENT_NAME}
-                EXCLUDE_FROM_ALL
-            )
-        endforeach()
-    endforeach()
-
+foreach(plugin ${IMAGEFORMATS_TO_INSTALL})
     set(
         COMPONENT_NAMES
 
-        CNPM_RUNTIME_Qt6_plugins_iconengines_QSvgIconPlugin
-        CNPM_RUNTIME_Qt6_plugins_iconengines
+        CNPM_RUNTIME_Qt6_plugins_imageformats_${plugin}
+        CNPM_RUNTIME_Qt6_plugins_imageformats
         CNPM_RUNTIME_Qt6_plugins
         CNPM_RUNTIME_Qt6
         CNPM_RUNTIME
@@ -291,15 +275,39 @@ if(WIN32)
     foreach(COMPONENT_NAME ${COMPONENT_NAMES})
         install(
             FILES
-                $<TARGET_FILE:Qt6::QSvgIconPlugin>
+                $<TARGET_FILE:Qt6::${plugin}>
             DESTINATION
-                "./iconengines"
+                "./imageformats"
             COMPONENT
                 ${COMPONENT_NAME}
             EXCLUDE_FROM_ALL
         )
     endforeach()
+endforeach()
 
+set(
+    COMPONENT_NAMES
+
+    CNPM_RUNTIME_Qt6_plugins_iconengines_QSvgIconPlugin
+    CNPM_RUNTIME_Qt6_plugins_iconengines
+    CNPM_RUNTIME_Qt6_plugins
+    CNPM_RUNTIME_Qt6
+    CNPM_RUNTIME
+)
+
+foreach(COMPONENT_NAME ${COMPONENT_NAMES})
+    install(
+        FILES
+            $<TARGET_FILE:Qt6::QSvgIconPlugin>
+        DESTINATION
+            "./iconengines"
+        COMPONENT
+            ${COMPONENT_NAME}
+        EXCLUDE_FROM_ALL
+    )
+endforeach()
+
+if(WIN32)
     set(
         COMPONENT_NAMES
 
