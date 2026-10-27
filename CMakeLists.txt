@@ -19,6 +19,11 @@ project(Qt
     LANGUAGES CXX C
 )
 
+include(${CMAKE_CURRENT_LIST_DIR}/rogii/cnpm/Include.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/rogii/environment.cmake)
+
+CNPM_PREPARE_PACKAGES(DEFAULT_REPOSITORY_URLS "$ENV{CNPM_URLS}")
+
 if(UNIX AND NOT ANDROID)
     enable_language(ASM)
 endif()
