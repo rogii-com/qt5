@@ -81,6 +81,7 @@ set(
     Designer
     LinguistTools
     QmlCompiler
+    QuickPrivate
     UiPlugin
     UiTools
     WidgetsPrivate
