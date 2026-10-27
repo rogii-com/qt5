@@ -35,6 +35,7 @@ set(
     QmlXmlListModel
     QuickControls2Basic
     QuickControls2BasicStyleImpl
+    QuickControls2FluentWinUI3
     QuickControls2FluentWinUI3StyleImpl
     QuickControls2Fusion
     QuickControls2FusionStyleImpl
@@ -43,6 +44,7 @@ set(
     QuickControls2Impl
     QuickControls2Material
     QuickControls2MaterialStyleImpl
+    QuickControls2Native
     QuickControls2
     QuickControls2Universal
     QuickControls2UniversalStyleImpl
@@ -71,7 +73,7 @@ set(
 )
 
 if(WIN32)
-list(APPEND COMPONENTS_TO_INSTALL QuickControls2WindowsStyleImpl)
+list(APPEND COMPONENTS_TO_INSTALL QuickControls2Windows QuickControls2WindowsStyleImpl QuickNativeStyle)
 endif()
 
 set(
