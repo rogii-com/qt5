@@ -51,7 +51,7 @@ set(
     QuickDialogs2Utils
     QuickEffects
     QuickLayouts
-    QuickParticlesPrivate
+    QuickParticles
     Quick
     QuickShapes
     QuickTemplates2
