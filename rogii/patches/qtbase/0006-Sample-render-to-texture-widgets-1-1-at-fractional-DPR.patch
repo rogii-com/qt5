@@ -1,0 +1,43 @@
+diff --git a/src/gui/painting/qbackingstoredefaultcompositor.cpp b/src/gui/painting/qbackingstoredefaultcompositor.cpp
+index 30f3a3a5fc7..d9cf56176ee 100644
+--- a/src/gui/painting/qbackingstoredefaultcompositor.cpp
++++ b/src/gui/painting/qbackingstoredefaultcompositor.cpp
+@@ -230,15 +230,30 @@ static bool prepareDrawForRenderToTextureWidget(const QPlatformTextureList *text
+     rectInWindow.translate(-offset);
+ 
+     const QRect clippedRectInWindow = rectInWindow & clipRect.translated(rectInWindow.topLeft());
+-    const QRect srcRect = toBottomLeftRect(clipRect, rectInWindow.height());
+-
+-    *target = targetTransform(scaledRect(clippedRectInWindow, window->devicePixelRatio()),
+-                              deviceWindowRect,
+-                              invertTargetY);
++    const qreal dpr = window->devicePixelRatio();
++    const QRect deviceRect = scaledRect(rectInWindow, dpr);
++    const QRect clippedDeviceRect = scaledRect(clippedRectInWindow, dpr);
++    const SourceTransformOrigin origin = invertSource ? SourceTransformOrigin::TopLeft
++                                                      : SourceTransformOrigin::BottomLeft;
++
++    *target = targetTransform(clippedDeviceRect, deviceWindowRect, invertTargetY);
++
++    // A texture widget renders into size() * dpr pixels, while its target spans the rounded
++    // device edges; at a fractional dpr the two differ by a pixel depending on the position.
++    // Fitting the texture onto the target resamples it with Nearest filtering and drops or
++    // doubles single texel rows and columns, so a texture within a pixel of its target is
++    // sampled 1:1 from its top-left corner instead.
++    const QRhiTexture *texture = textures->texture(idx);
++    const QSize textureSize = texture ? texture->pixelSize() : QSize();
++    const QSize slack = textureSize - deviceRect.size();
++    if (!textureSize.isEmpty() && qAbs(slack.width()) <= 1 && qAbs(slack.height()) <= 1) {
++        const QRect texels(clippedDeviceRect.topLeft() - deviceRect.topLeft(), clippedDeviceRect.size());
++        *source = sourceTransform(toBottomLeftRect(texels, textureSize.height()), textureSize, origin);
++        return true;
++    }
+ 
+-    *source = sourceTransform(scaledRect(srcRect, window->devicePixelRatio()),
+-                              scaledRect(rectInWindow, window->devicePixelRatio()).size(),
+-                              invertSource ? SourceTransformOrigin::TopLeft : SourceTransformOrigin::BottomLeft);
++    const QRect srcRect = toBottomLeftRect(clipRect, rectInWindow.height());
++    *source = sourceTransform(scaledRect(srcRect, dpr), deviceRect.size(), origin);
+ 
+     return true;
+ }
