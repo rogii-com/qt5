@@ -1,0 +1,75 @@
+diff --git a/src/widgets/itemviews/qtableview.cpp b/src/widgets/itemviews/qtableview.cpp
+index af552952f4e..c52a07d79f6 100644
+--- a/src/widgets/itemviews/qtableview.cpp
++++ b/src/widgets/itemviews/qtableview.cpp
+@@ -25,6 +25,7 @@
+ #endif
+ 
+ #include <algorithm>
++#include <cmath>
+ 
+ using namespace std::chrono_literals;
+ 
+@@ -1658,8 +1659,52 @@ void QTableView::paintEvent(QPaintEvent *event)
+             while (verticalHeader->isSectionHidden(verticalHeader->logicalIndex(bottom))) --bottom;
+             QPen old = painter.pen();
+             painter.setPen(gridPen);
++            // A 1 px pen at a fractional device pixel ratio rasterizes as 1 or 2 device pixels
++            // depending on the line position. Fill the device pixels of the reserved grid line
++            // instead: a band of ceil(dpr) pixels ending on the rounded section boundary always
++            // covers the reserved gap and has the same width for every row and column.
++            const QTransform deviceTransform = painter.deviceTransform();
++            const qreal scale = deviceTransform.m11();
++            const bool snapToDevicePixels = d->gridStyle == Qt::SolidLine
++                    && deviceTransform.type() <= QTransform::TxScale
++                    && qFuzzyCompare(scale, deviceTransform.m22())
++                    && qAbs(scale - qRound(scale)) > 1e-6;
++            if (snapToDevicePixels) {
++                const int lineWidth = int(std::ceil(scale));
++                const auto deviceX = [&deviceTransform](int x) {
++                    return qRound(deviceTransform.map(QPointF(x, 0)).x());
++                };
++                const auto deviceY = [&deviceTransform](int y) {
++                    return qRound(deviceTransform.map(QPointF(0, y)).y());
++                };
++                const int deviceLeft = deviceX(dirtyArea.left());
++                const int deviceRight = deviceX(dirtyArea.right() + 1);
++                const int deviceTop = deviceY(dirtyArea.top());
++                const int deviceBottom = deviceY(dirtyArea.bottom() + 1);
++                painter.save();
++                painter.setTransform(deviceTransform.inverted());
++                for (int visualIndex = top; visualIndex <= bottom; ++visualIndex) {
++                    const int row = verticalHeader->logicalIndex(visualIndex);
++                    if (verticalHeader->isSectionHidden(row))
++                        continue;
++                    const int rowEnd = deviceY(rowViewportPosition(row) + offset.y() + rowHeight(row));
++                    painter.fillRect(QRect(deviceLeft, rowEnd - lineWidth,
++                                           deviceRight - deviceLeft, lineWidth), gridColor);
++                }
++                for (int h = left; h <= right; ++h) {
++                    const int col = horizontalHeader->logicalIndex(h);
++                    if (horizontalHeader->isSectionHidden(col))
++                        continue;
++                    const int colp = columnViewportPosition(col) + offset.x();
++                    const int lineLeft = rightToLeft ? deviceX(colp)
++                                                     : deviceX(colp + columnWidth(col)) - lineWidth;
++                    painter.fillRect(QRect(lineLeft, deviceTop, lineWidth, deviceBottom - deviceTop),
++                                     gridColor);
++                }
++                painter.restore();
++            }
+             // Paint each row
+-            for (int visualIndex = top; visualIndex <= bottom; ++visualIndex) {
++            for (int visualIndex = top; !snapToDevicePixels && visualIndex <= bottom; ++visualIndex) {
+                 int row = verticalHeader->logicalIndex(visualIndex);
+                 if (verticalHeader->isSectionHidden(row))
+                     continue;
+@@ -1671,7 +1716,7 @@ void QTableView::paintEvent(QPaintEvent *event)
+             }
+ 
+             // Paint each column
+-            for (int h = left; h <= right; ++h) {
++            for (int h = left; !snapToDevicePixels && h <= right; ++h) {
+                 int col = horizontalHeader->logicalIndex(h);
+                 if (horizontalHeader->isSectionHidden(col))
+                     continue;
