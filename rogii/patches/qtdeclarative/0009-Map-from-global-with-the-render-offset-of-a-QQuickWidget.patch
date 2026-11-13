@@ -1,0 +1,20 @@
+diff --git a/src/quick/items/qquickitem.cpp b/src/quick/items/qquickitem.cpp
+--- a/src/quick/items/qquickitem.cpp
++++ b/src/quick/items/qquickitem.cpp
+@@ -9226,11 +9226,15 @@
+ QPointF QQuickItem::mapFromGlobal(const QPointF &point) const
+ {
+     Q_D(const QQuickItem);
++    static_assert(QT_VERSION < QT_VERSION_CHECK(6, 12, 1),
++                  "Rogii patch 0009: QQuickItem::mapFromGlobal() ignores the QQuickWidget render offset since "
++                  "qtdeclarative d5487f4497 (6.12.0), so mapFromGlobal(mapToGlobal(p)) != p. If this Qt version "
++                  "passes &renderOffset to d->renderWindow() here, drop the patch; otherwise move it to this version.");
+ 
+     QPointF scenePoint;
+     if (Q_LIKELY(d->window)) {
+         QPoint renderOffset;
+-        QWindow *renderWindow = d->renderWindow();
++        QWindow *renderWindow = d->renderWindow(&renderOffset);
+         scenePoint = renderWindow->mapFromGlobal(point) - renderOffset;
+     } else {
+         scenePoint = point;
