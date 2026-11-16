@@ -1,23 +1,15 @@
 diff --git a/src/widgets/itemviews/qtableview.cpp b/src/widgets/itemviews/qtableview.cpp
-index af552952f4e..c52a07d79f6 100644
+index af552952f4e..2da426e1def 100644
 --- a/src/widgets/itemviews/qtableview.cpp
 +++ b/src/widgets/itemviews/qtableview.cpp
-@@ -25,6 +25,7 @@
- #endif
- 
- #include <algorithm>
-+#include <cmath>
- 
- using namespace std::chrono_literals;
- 
-@@ -1658,8 +1659,52 @@ void QTableView::paintEvent(QPaintEvent *event)
+@@ -1658,8 +1658,52 @@ void QTableView::paintEvent(QPaintEvent *event)
              while (verticalHeader->isSectionHidden(verticalHeader->logicalIndex(bottom))) --bottom;
              QPen old = painter.pen();
              painter.setPen(gridPen);
 +            // A 1 px pen at a fractional device pixel ratio rasterizes as 1 or 2 device pixels
 +            // depending on the line position. Fill the device pixels of the reserved grid line
-+            // instead: a band of ceil(dpr) pixels ending on the rounded section boundary always
-+            // covers the reserved gap and has the same width for every row and column.
++            // instead: a band of round(dpr) pixels ending on the rounded section boundary keeps
++            // the nearest whole-pixel weight of the pen and the same width for every row and column.
 +            const QTransform deviceTransform = painter.deviceTransform();
 +            const qreal scale = deviceTransform.m11();
 +            const bool snapToDevicePixels = d->gridStyle == Qt::SolidLine
@@ -25,7 +17,7 @@ index af552952f4e..c52a07d79f6 100644
 +                    && qFuzzyCompare(scale, deviceTransform.m22())
 +                    && qAbs(scale - qRound(scale)) > 1e-6;
 +            if (snapToDevicePixels) {
-+                const int lineWidth = int(std::ceil(scale));
++                const int lineWidth = qMax(1, qRound(scale));
 +                const auto deviceX = [&deviceTransform](int x) {
 +                    return qRound(deviceTransform.map(QPointF(x, 0)).x());
 +                };
@@ -64,7 +56,7 @@ index af552952f4e..c52a07d79f6 100644
                  int row = verticalHeader->logicalIndex(visualIndex);
                  if (verticalHeader->isSectionHidden(row))
                      continue;
-@@ -1671,7 +1716,7 @@ void QTableView::paintEvent(QPaintEvent *event)
+@@ -1671,7 +1715,7 @@ void QTableView::paintEvent(QPaintEvent *event)
              }
  
              // Paint each column
