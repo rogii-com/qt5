@@ -1,0 +1,16 @@
+diff --git a/src/plugins/platforms/windows/qwindowswindow.cpp b/src/plugins/platforms/windows/qwindowswindow.cpp
+--- a/src/plugins/platforms/windows/qwindowswindow.cpp
++++ b/src/plugins/platforms/windows/qwindowswindow.cpp
+@@ -2416,8 +2416,11 @@ void QWindowsWindow::checkForScreenChanged(ScreenChangeMode mode, const RECT *su
+         return;
+     // For screens with different DPI: postpone until WM_DPICHANGE
+     // Check on currentScreen as it can be 0 when resuming a session (QTBUG-80436).
++    // A hidden window gets no WM_DPICHANGED when it is moved to such a screen,
++    // so the screen change is applied right away, as QWindow::setGeometry()
++    // leaves it to the platform since QTBUG-145444.
+     const bool changingDpi = !equalDpi(QDpi(savedDpi(), savedDpi()), newScreen->logicalDpi());
+-    if (mode == FromGeometryChange && currentScreen != nullptr && changingDpi)
++    if (mode == FromGeometryChange && currentScreen != nullptr && changingDpi && IsWindowVisible(m_data.hwnd))
+         return;
+ 
+     qCDebug(lcQpaWindow).noquote().nospace() << __FUNCTION__
