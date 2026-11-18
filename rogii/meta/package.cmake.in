@@ -1,0 +1,55 @@
+set(
+    QT_PACKAGE_VARIANT
+    "@DEFAULT_PACKAGE@"
+)
+
+if(QT_FORCE_ASSERTS)
+    if("@ASSERTS_PACKAGE@" STREQUAL "")
+        message(
+            FATAL_ERROR
+            "QT_FORCE_ASSERTS: this Qt package has no asserts variant for the platform."
+        )
+    endif()
+
+    # The asserts variant holds the release configuration only.
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        message(
+            FATAL_ERROR
+            "QT_FORCE_ASSERTS: the Qt asserts variant has no Debug configuration."
+        )
+    endif()
+
+    set(
+        QT_PACKAGE_VARIANT
+        "@ASSERTS_PACKAGE@"
+    )
+endif()
+
+# This file is included from CNPM_PREPARE_PACKAGES, whose scope holds its settings under the
+# ${P} prefix; the variant is fetched and included right away, so Qt is ready before the
+# packages declared after it.
+NPM_PREPARE_PACKAGE(
+    PACKAGE_NAME
+        ${QT_PACKAGE_VARIANT}
+    REPOSITORY_URLS
+        ${${P}REPOSITORY_URLS}
+    FORCE
+        ${${P}FORCE}
+    ROOT
+        ${${P}ROOT}
+    TMP
+        ${${P}TMP}
+    ARCHIVE_TYPE
+        7z
+)
+
+message(
+    STATUS
+    "Qt package variant: ${QT_PACKAGE_VARIANT}"
+)
+
+include("${${P}ROOT}/${QT_PACKAGE_VARIANT}/package.cmake")
+
+unset(
+    QT_PACKAGE_VARIANT
+)
