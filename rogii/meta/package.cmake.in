@@ -1,10 +1,20 @@
 set(
-    QT_PACKAGE_VARIANT
+    QT_DEFAULT_PACKAGE
     "@DEFAULT_PACKAGE@"
 )
 
+set(
+    QT_ASSERTS_PACKAGE
+    "@ASSERTS_PACKAGE@"
+)
+
+set(
+    QT_PACKAGE_VARIANT
+    "${QT_DEFAULT_PACKAGE}"
+)
+
 if(QT_FORCE_ASSERTS)
-    if("@ASSERTS_PACKAGE@" STREQUAL "")
+    if(NOT QT_ASSERTS_PACKAGE)
         message(
             FATAL_ERROR
             "QT_FORCE_ASSERTS: this Qt package has no asserts variant for the platform."
@@ -21,7 +31,7 @@ if(QT_FORCE_ASSERTS)
 
     set(
         QT_PACKAGE_VARIANT
-        "@ASSERTS_PACKAGE@"
+        "${QT_ASSERTS_PACKAGE}"
     )
 endif()
 
@@ -49,6 +59,14 @@ message(
 )
 
 include("${${P}ROOT}/${QT_PACKAGE_VARIANT}/package.cmake")
+
+unset(
+    QT_DEFAULT_PACKAGE
+)
+
+unset(
+    QT_ASSERTS_PACKAGE
+)
 
 unset(
     QT_PACKAGE_VARIANT
