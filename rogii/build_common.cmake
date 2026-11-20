@@ -104,6 +104,15 @@ if(NOT VARIANT MATCHES "^(default|asserts)$")
     )
 endif()
 
+# The UNIX install below takes the RelWithDebInfo configuration of a multi-configuration build,
+# which the release-only asserts build does not have.
+if(VARIANT STREQUAL "asserts" AND UNIX)
+    message(
+        FATAL_ERROR
+        "QT_VARIANT 'asserts' is built for Windows only."
+    )
+endif()
+
 set(
     PACKAGE_NAME
     "qt${VARIANT}-${ROGII_PKG_VERSION}-${ARCH}-${BUILD}${TAG}"

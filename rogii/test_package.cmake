@@ -64,15 +64,22 @@ if(WIN32)
     )
 endif()
 
+# The variants are configured one after another in the same build directory, as a consumer
+# switching QT_FORCE_ASSERTS does.
+set(
+    BINARY_DIR
+    "${ROOT}/test"
+)
+
+file(
+    REMOVE_RECURSE
+    "${BINARY_DIR}"
+)
+
 foreach(VARIANT ${VARIANTS})
     message(
         STATUS
         "Testing the ${VARIANT} variant"
-    )
-
-    set(
-        BINARY_DIR
-        "${ROOT}/test-${VARIANT}"
     )
 
     set(
@@ -86,11 +93,6 @@ foreach(VARIANT ${VARIANTS})
             ON
         )
     endif()
-
-    file(
-        REMOVE_RECURSE
-        "${BINARY_DIR}"
-    )
 
     execute_process(
         COMMAND
@@ -125,6 +127,23 @@ foreach(VARIANT ${VARIANTS})
         )
     endif()
 
+    file(
+        STRINGS
+            "${BINARY_DIR}/build/CMakeCache.txt"
+            QT_DIR_ENTRIES
+        REGEX
+            "^Qt6.*_DIR:PATH="
+    )
+
+    foreach(QT_DIR_ENTRY ${QT_DIR_ENTRIES})
+        if(NOT QT_DIR_ENTRY MATCHES "/qt${VARIANT}-|-NOTFOUND$")
+            message(
+                FATAL_ERROR
+                "The ${VARIANT} test build caches a Qt package directory of another package: ${QT_DIR_ENTRY}"
+            )
+        endif()
+    endforeach()
+
     execute_process(
         COMMAND
             ${CMAKE_COMMAND} --build "${BINARY_DIR}/build"
@@ -135,7 +154,7 @@ foreach(VARIANT ${VARIANTS})
     foreach(COMPONENT Unspecified CNPM_RUNTIME_Qt6_Core)
         execute_process(
             COMMAND
-                ${CMAKE_COMMAND} --install "${BINARY_DIR}/build" --prefix "${BINARY_DIR}/install" --component ${COMPONENT}
+                ${CMAKE_COMMAND} --install "${BINARY_DIR}/build" --prefix "${BINARY_DIR}/install-${VARIANT}" --component ${COMPONENT}
             COMMAND_ERROR_IS_FATAL
                 ANY
         )
@@ -143,7 +162,7 @@ foreach(VARIANT ${VARIANTS})
 
     execute_process(
         COMMAND
-            ${CMAKE_COMMAND} -E env QT_FORCE_STDERR_LOGGING=1 "${BINARY_DIR}/install/qt_package_test${CMAKE_EXECUTABLE_SUFFIX}"
+            ${CMAKE_COMMAND} -E env QT_FORCE_STDERR_LOGGING=1 "${BINARY_DIR}/install-${VARIANT}/qt_package_test${CMAKE_EXECUTABLE_SUFFIX}"
         OUTPUT_VARIABLE
             RUN_OUTPUT
         ERROR_VARIABLE
