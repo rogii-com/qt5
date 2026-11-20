@@ -64,6 +64,38 @@ if(WIN32)
     )
 endif()
 
+function(run_probe INSTALL_DIR EXPECT_ASSERT)
+    execute_process(
+        COMMAND
+            ${CMAKE_COMMAND} -E env QT_FORCE_STDERR_LOGGING=1 "${INSTALL_DIR}/qt_package_test${CMAKE_EXECUTABLE_SUFFIX}"
+        OUTPUT_VARIABLE
+            RUN_OUTPUT
+        ERROR_VARIABLE
+            RUN_OUTPUT
+        RESULT_VARIABLE
+            RUN_RESULT
+    )
+
+    message(
+        STATUS
+        "exit code ${RUN_RESULT}: ${RUN_OUTPUT}"
+    )
+
+    if(EXPECT_ASSERT)
+        if(RUN_RESULT EQUAL 0 OR NOT RUN_OUTPUT MATCHES "ASSERT failure in QCoreApplication")
+            message(
+                FATAL_ERROR
+                "The probe in ${INSTALL_DIR} did not fail on the Q_ASSERT inside Qt."
+            )
+        endif()
+    elseif(NOT RUN_RESULT EQUAL 0 OR NOT RUN_OUTPUT MATCHES "no assert fired")
+        message(
+            FATAL_ERROR
+            "The probe in ${INSTALL_DIR} did not run to the end."
+        )
+    endif()
+endfunction()
+
 # The variants are configured one after another in the same build directory, as a consumer
 # switching QT_FORCE_ASSERTS does.
 set(
@@ -160,33 +192,62 @@ foreach(VARIANT ${VARIANTS})
         )
     endforeach()
 
+    run_probe("${BINARY_DIR}/install-${VARIANT}" ${FORCE_ASSERTS})
+endforeach()
+
+if(NOT "asserts" IN_LIST VARIANTS)
+    return()
+endif()
+
+# A multi-configuration tree gets the asserts variant for every configuration, Debug included.
+message(
+    STATUS
+    "Testing the Debug configuration of the asserts variant in a multi-configuration build"
+)
+
+list(
+    TRANSFORM
+        GENERATOR_ARGS
+    REPLACE
+        "^Ninja$"
+        "Ninja Multi-Config"
+)
+
+execute_process(
+    COMMAND
+        ${CMAKE_COMMAND}
+        -S "${CMAKE_CURRENT_LIST_DIR}/test"
+        -B "${BINARY_DIR}/multi"
+        ${GENERATOR_ARGS}
+        "-DCNPM_ROOT=${ROOT}"
+        -DQT_META_BUILD_NUMBER=${META_BUILD_NUMBER}
+        "-DQT_META_TAG=$ENV{TAG}"
+        -DQT_FORCE_ASSERTS=ON
+    COMMAND_ERROR_IS_FATAL
+        ANY
+)
+
+execute_process(
+    COMMAND
+        ${CMAKE_COMMAND} --build "${BINARY_DIR}/multi" --config Debug
+    COMMAND_ERROR_IS_FATAL
+        ANY
+)
+
+foreach(COMPONENT Unspecified CNPM_RUNTIME_Qt6_Core)
     execute_process(
         COMMAND
-            ${CMAKE_COMMAND} -E env QT_FORCE_STDERR_LOGGING=1 "${BINARY_DIR}/install-${VARIANT}/qt_package_test${CMAKE_EXECUTABLE_SUFFIX}"
-        OUTPUT_VARIABLE
-            RUN_OUTPUT
-        ERROR_VARIABLE
-            RUN_OUTPUT
-        RESULT_VARIABLE
-            RUN_RESULT
+            ${CMAKE_COMMAND} --install "${BINARY_DIR}/multi" --config Debug --prefix "${BINARY_DIR}/install-multi-debug" --component ${COMPONENT}
+        COMMAND_ERROR_IS_FATAL
+            ANY
     )
-
-    message(
-        STATUS
-        "exit code ${RUN_RESULT}: ${RUN_OUTPUT}"
-    )
-
-    if(VARIANT STREQUAL "asserts")
-        if(RUN_RESULT EQUAL 0 OR NOT RUN_OUTPUT MATCHES "ASSERT failure in QCoreApplication")
-            message(
-                FATAL_ERROR
-                "The asserts variant did not fail on the Q_ASSERT inside Qt."
-            )
-        endif()
-    elseif(NOT RUN_RESULT EQUAL 0 OR NOT RUN_OUTPUT MATCHES "no assert fired")
-        message(
-            FATAL_ERROR
-            "The default variant did not run to the end."
-        )
-    endif()
 endforeach()
+
+if(WIN32 AND NOT EXISTS "${BINARY_DIR}/install-multi-debug/Qt6CoreRogiid.dll")
+    message(
+        FATAL_ERROR
+        "The Debug configuration of the asserts variant did not install the Debug Qt library."
+    )
+endif()
+
+run_probe("${BINARY_DIR}/install-multi-debug" ON)

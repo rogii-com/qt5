@@ -104,15 +104,6 @@ if(NOT VARIANT MATCHES "^(default|asserts)$")
     )
 endif()
 
-# The UNIX install below takes the RelWithDebInfo configuration of a multi-configuration build,
-# which the release-only asserts build does not have.
-if(VARIANT STREQUAL "asserts" AND UNIX)
-    message(
-        FATAL_ERROR
-        "QT_VARIANT 'asserts' is built for Windows only."
-    )
-endif()
-
 set(
     PACKAGE_NAME
     "qt${VARIANT}-${ROGII_PKG_VERSION}-${ARCH}-${BUILD}${TAG}"
@@ -185,15 +176,15 @@ set(
 )
 
 set(
-    BUILD_TYPE_ARGS
-    -debug-and-release
+    VARIANT_ARGS
+    ""
 )
 
-# Q_ASSERT stays live inside the release libraries; this variant has no debug configuration.
+# Q_ASSERT stays live inside the release libraries as well.
 if(VARIANT STREQUAL "asserts")
     set(
-        BUILD_TYPE_ARGS
-        "-release -force-asserts"
+        VARIANT_ARGS
+        -force-asserts
     )
 endif()
 
@@ -201,7 +192,8 @@ set(
     CONFIGURE_CMD_ARGS
     "-shared \
 -c++std c++20 \
-${BUILD_TYPE_ARGS} \
+-debug-and-release \
+${VARIANT_ARGS} \
 -force-debug-info \
 -separate-debug-info \
 -no-pch \

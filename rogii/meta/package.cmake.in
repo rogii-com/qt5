@@ -21,21 +21,6 @@ if(QT_FORCE_ASSERTS)
         )
     endif()
 
-    # The asserts variant holds the release configuration only.
-    get_property(
-        QT_IS_MULTI_CONFIG
-        GLOBAL
-        PROPERTY
-            GENERATOR_IS_MULTI_CONFIG
-    )
-
-    if(QT_IS_MULTI_CONFIG OR CMAKE_BUILD_TYPE STREQUAL "Debug")
-        message(
-            FATAL_ERROR
-            "QT_FORCE_ASSERTS: the Qt asserts variant has no Debug configuration, so it needs a single-configuration generator and a build type other than Debug."
-        )
-    endif()
-
     set(
         QT_PACKAGE_VARIANT
         "${QT_ASSERTS_PACKAGE}"
@@ -77,8 +62,4 @@ unset(
 
 unset(
     QT_PACKAGE_VARIANT
-)
-
-unset(
-    QT_IS_MULTI_CONFIG
 )
