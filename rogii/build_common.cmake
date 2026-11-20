@@ -83,9 +83,30 @@ include(
     "${CMAKE_CURRENT_LIST_DIR}/version.cmake"
 )
 
+# Consumers pin the qt meta package, which pulls one of these variants;
+# build_meta_package.cmake makes it from the names of the built variants.
+set(
+    VARIANT
+    default
+)
+
+if(DEFINED ENV{QT_VARIANT})
+    set(
+        VARIANT
+        $ENV{QT_VARIANT}
+    )
+endif()
+
+if(NOT VARIANT MATCHES "^(default|asserts)$")
+    message(
+        FATAL_ERROR
+        "Unknown QT_VARIANT '${VARIANT}': expected 'default' or 'asserts'."
+    )
+endif()
+
 set(
     PACKAGE_NAME
-    "qt-${ROGII_PKG_VERSION}-${ARCH}-${BUILD}${TAG}"
+    "qt${VARIANT}-${ROGII_PKG_VERSION}-${ARCH}-${BUILD}${TAG}"
 )
 
 set(
@@ -155,10 +176,24 @@ set(
 )
 
 set(
+    VARIANT_ARGS
+    ""
+)
+
+# Q_ASSERT stays live inside the release libraries as well.
+if(VARIANT STREQUAL "asserts")
+    set(
+        VARIANT_ARGS
+        -force-asserts
+    )
+endif()
+
+set(
     CONFIGURE_CMD_ARGS
     "-shared \
 -c++std c++20 \
 -debug-and-release \
+${VARIANT_ARGS} \
 -force-debug-info \
 -separate-debug-info \
 -no-pch \
