@@ -2,6 +2,8 @@
 # meta package, then for each variant configures a project that pins it, builds it, installs
 # the Qt runtime with the package's install rules and runs it.
 
+cmake_minimum_required(VERSION 3.20)
+
 if(NOT DEFINED ENV{ENV_INSTALL})
     message(
         FATAL_ERROR
