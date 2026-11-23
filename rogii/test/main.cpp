@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QtTaskTree/qtasktree.h>
 
 #include <cstdio>
 
@@ -19,6 +20,13 @@ int main(int argc, char **argv)
 #endif
 
     QCoreApplication first(argc, argv);
+
+    if (QtTaskTree::QTaskTree::runBlocking(QtTaskTree::Group{QtTaskTree::finishAllAndSuccess})
+        == QtTaskTree::DoneWith::Success) {
+        std::puts("task tree done");
+        std::fflush(stdout);
+    }
+
     QCoreApplication second(argc, argv);
     std::puts("no assert fired");
     return 0;

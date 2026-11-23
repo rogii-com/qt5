@@ -22,7 +22,7 @@ CNPM_PREPARE_PACKAGES(DEFAULT_REPOSITORY_URLS "")
 
 add_executable(qt_package_test main.cpp)
 
-target_link_libraries(qt_package_test PRIVATE Qt6::Core)
+target_link_libraries(qt_package_test PRIVATE Qt6::Core Qt6::TaskTree)
 
 set_target_properties(qt_package_test PROPERTIES INSTALL_RPATH "$ORIGIN")
 

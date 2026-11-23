@@ -104,6 +104,7 @@ set(
     Xml
     StateMachine
     ShaderTools
+    TaskTree
 )
 
 if(WIN32)
