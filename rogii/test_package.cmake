@@ -192,7 +192,7 @@ foreach(VARIANT ${VARIANTS})
             ANY
     )
 
-    foreach(COMPONENT Unspecified CNPM_RUNTIME_Qt6_Core CNPM_RUNTIME_Qt6_TaskTree)
+    foreach(COMPONENT Unspecified CNPM_RUNTIME_Qt6_Core CNPM_RUNTIME_Qt6_Concurrent CNPM_RUNTIME_Qt6_Network CNPM_RUNTIME_Qt6_TaskTree)
         execute_process(
             COMMAND
                 ${CMAKE_COMMAND} --install "${BINARY_DIR}/build" --prefix "${BINARY_DIR}/install-${VARIANT}" --component ${COMPONENT}
@@ -243,7 +243,7 @@ execute_process(
         ANY
 )
 
-foreach(COMPONENT Unspecified CNPM_RUNTIME_Qt6_Core CNPM_RUNTIME_Qt6_TaskTree)
+foreach(COMPONENT Unspecified CNPM_RUNTIME_Qt6_Core CNPM_RUNTIME_Qt6_Concurrent CNPM_RUNTIME_Qt6_Network CNPM_RUNTIME_Qt6_TaskTree)
     execute_process(
         COMMAND
             ${CMAKE_COMMAND} --install "${BINARY_DIR}/multi" --config Debug --prefix "${BINARY_DIR}/install-multi-debug" --component ${COMPONENT}
