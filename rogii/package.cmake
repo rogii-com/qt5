@@ -8,6 +8,40 @@ set(
     "${CMAKE_CURRENT_LIST_DIR}"
 )
 
+# A build directory configured against another Qt package, such as the other variant of this one,
+# keeps that package's Qt6*_DIR cache entries, and find_package would follow them instead.
+get_cmake_property(
+    CACHED_VARIABLES
+    CACHE_VARIABLES
+)
+
+foreach(CACHED_VARIABLE ${CACHED_VARIABLES})
+    if(CACHED_VARIABLE MATCHES "^Qt6.*_DIR$")
+        cmake_path(
+            IS_PREFIX
+                CMAKE_CURRENT_LIST_DIR
+                "${${CACHED_VARIABLE}}"
+                NORMALIZE
+                IS_OWN_DIR
+        )
+
+        if(NOT IS_OWN_DIR)
+            unset(
+                ${CACHED_VARIABLE}
+                CACHE
+            )
+        endif()
+    endif()
+endforeach()
+
+unset(
+    CACHED_VARIABLES
+)
+
+unset(
+    IS_OWN_DIR
+)
+
 set(
     QT_VERSION
     6.12.0
