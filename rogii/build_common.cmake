@@ -115,7 +115,7 @@ set(
         --mirror https://github.com/qt/ \
         --no-resolve-deps \
         --no-optional-deps \
-        -submodules qtdoc,qtactiveqt,qt5compat,qtbase,qtdeclarative,qtimageformats,qtshadertools,qtsvg,qttranslations,qtwebsockets,qttools,qtscxml "
+        -submodules qtdoc,qtactiveqt,qt5compat,qtbase,qtdeclarative,qtimageformats,qtshadertools,qtsvg,qttranslations,qtwebsockets,qttools,qtscxml,qttasktree "
 )
 
 # init-repository.bat loses the exit code of its CMake script, so success is read from the
